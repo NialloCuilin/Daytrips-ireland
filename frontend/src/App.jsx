@@ -8,22 +8,27 @@ import About from './pages/About';
 import Daytrips from './pages/Daytrips';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 function App() {
   return (
-    <main className="main-content">
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />}/>
-        <Route path="/about" element={<About />}/>
-        <Route path="/daytrips" element={<Daytrips />}/>
-        <Route path="/login" element={<Login />}/>
-        <Route path="/signup" element={<Signup />}/>
-      </Routes>
-    </main>
+    <div className="flex flex-col min-h-screen">
+      <Navbar/>
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />}/>
+          <Route path="/about" element={<About />}/>
+          <Route path="/daytrips" element={<Daytrips />}/>
+          <Route path="/contact" element={<Contact/>}/>
+          <Route path="/login" element={<Login />}/>
+          <Route path="/signup" element={<Signup />}/>
+        </Routes>
+      </main> 
+      <Footer/>
+    </div>
   );
 }
 
