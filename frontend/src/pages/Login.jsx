@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
@@ -12,11 +13,28 @@ function Login() {
       return;
     }
 
-    // Simulate login success
-    console.log("Logging in:", { email, password });
-    alert("Logged in!");
+    try {
+      const res = await axios.post('http://localhost:5000/api/users/login', {
+        email,
+        password,
+      });
+
+      console.log(res.data); // Useful for debugging
+
+      // Save user info and token
+      localStorage.setItem('userInfo', JSON.stringify(res.data));
+
+      alert('Login successful!');
+      
+      // Redirect if you want (later we can use navigate('/profile'))
+      window.location.href = '/';
+
+    } catch (error) {
+      console.error(error.response?.data?.message || error.message);
+      alert(error.response?.data?.message || 'Login failed');
+    }
   };
-XMLDocument
+
   return (
     <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
       <h2 className="text-2xl font-bold mb-4">Login</h2>
