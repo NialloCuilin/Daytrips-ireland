@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 // @route   POST /api/users/register
 // @access  Public
 const registerUser = async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, county } = req.body;
 
   // Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -24,6 +24,7 @@ const registerUser = async (req, res) => {
     lastName,
     email,
     password: hashedPassword,
+    county, 
   });
 
   await user.save();
@@ -70,6 +71,8 @@ const loginUser = async (req, res) => {
     _id: user._id,
     firstName: user.firstName,
     email: user.email,
+    county: user.county,
+    avatar: user.avatar,
     token,
   });
 };

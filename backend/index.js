@@ -1,15 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); // <-- Add this line
+const cors = require('cors'); 
 require('dotenv').config();
 
 const app = express();
 const userRoutes = require('./routes/userRoutes');
+const daytripRoutes = require('./routes/daytripRoutes');
 
 // Middleware
-app.use(cors()); // <-- Add this line
+app.use(cors()); 
 app.use(express.json({ limit: '10mb' }));
 app.use('/api/users', userRoutes);
+app.use('/api/daytrips', daytripRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)

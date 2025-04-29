@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaUserFriends, FaBookmark, FaMapMarkedAlt, FaMedal } from 'react-icons/fa';
+import { FaMapMarkerAlt } from 'react-icons/fa';
+import CreateDaytrip from './CreateDaytrip';
 import axios from 'axios';
+
 
 // Random pastel color generator
 const getRandomColor = () => {
@@ -13,11 +16,23 @@ const getRandomColor = () => {
 };
 
 function Profile() {
-  const user = JSON.parse(localStorage.getItem('userInfo'));
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const stored = localStorage.getItem('userInfo');
+    if (stored) {
+      setUser(JSON.parse(stored));
+    }
+  }, []);
+  useEffect(() => {
+    if (user?.avatar) {
+      setAvatar(user.avatar);
+    }
+  }, [user]);     
   const [activeTab, setActiveTab] = useState('daytrips');
   const [avatar, setAvatar] = useState(user?.avatar || null);
   const [avatarColor, setAvatarColor] = useState('');
   const fileInputRef = useRef(null);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const savedColor = localStorage.getItem('avatarColor');
@@ -106,6 +121,10 @@ function Profile() {
         {/* User Info */}
         <h2 className="text-4xl font-bold mb-2">{user?.firstName} {user?.lastName}</h2>
         <p className="text-gray-500">{user?.email}</p>
+        <p className="text-gray-500 flex items-center gap-1">
+        <FaMapMarkerAlt className="text-black" />   
+          Co. {user?.county}
+      </p>    
       </div>
 
       {/* Tabs */}
@@ -147,8 +166,16 @@ function Profile() {
       <div className="bg-white rounded-lg shadow p-6">
         {activeTab === 'daytrips' && (
           <div>
-            <h3 className="text-xl font-bold mb-4">Your Created Daytrips</h3>
-            <p>Here you will see all the daytrips you’ve created!</p>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Your Created Daytrips</h3>
+              <button
+                onClick={() => setShowForm(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              >
+                + Create Daytrip
+              </button>
+            </div>
+            <p>You will see all the daytrips you’ve created here!</p>
           </div>
         )}
         {activeTab === 'saved' && (
@@ -169,8 +196,24 @@ function Profile() {
             <p>Connect with other explorers here!</p>
           </div>
         )}
-      </div>
+          </div>
+
+        {showForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full relative">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+                onClick={() => setShowForm(false)}
+              >
+                &times;
+              </button>
+              <CreateDaytrip onClose={() => setShowForm(false)} />
+            </div>
+          </div>
+        )}
     </div>
+
+    
   );
 }
 

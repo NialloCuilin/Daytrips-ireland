@@ -8,6 +8,7 @@ function Signup() {
     email: '',
     password: '',
     confirmPassword: '',
+    county: '',
   });
 
   const handleChange = (e) => {
@@ -33,6 +34,7 @@ function Signup() {
         lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
+        county: formData.county,
       });
       
       console.log(res.data);
@@ -88,6 +90,27 @@ function Signup() {
           value={formData.confirmPassword}
           onChange={handleChange}
         />
+
+        <select
+          name="county"
+          value={formData.county}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required
+        >
+          <option value="">Select your home county</option>
+          {[
+            'Antrim', 'Armagh', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Derry', 'Donegal',
+            'Down', 'Dublin', 'Fermanagh', 'Galway', 'Kerry', 'Kildare', 'Kilkenny',
+            'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath',
+            'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Tyrone',
+            'Waterford', 'Westmeath', 'Wexford', 'Wicklow'
+          ].map((county) => (
+            <option key={county} value={county}>
+              County {county}
+            </option>
+            ))}
+        </select>
         <button
           type="submit"
           className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"

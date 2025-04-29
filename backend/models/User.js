@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '', 
     },
+    county: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

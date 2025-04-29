@@ -12,6 +12,7 @@ import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import CreateDaytrip from './pages/CreateDaytrip';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/login" element={<Login />}/>
           <Route path="/signup" element={<Signup />}/>
           <Route path="/profile" element={<Profile />}/>
+          <Route path="/create-daytrip" element={<CreateDaytrip />} />
         </Routes>
       </main> 
       <Footer/>
