@@ -8,7 +8,7 @@ const userRoutes = require('./routes/userRoutes');
 
 // Middleware
 app.use(cors()); // <-- Add this line
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use('/api/users', userRoutes);
 
 // Connect to MongoDB

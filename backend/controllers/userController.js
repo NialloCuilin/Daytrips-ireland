@@ -74,7 +74,29 @@ const loginUser = async (req, res) => {
   });
 };
 
+//update user avatar
+const updateAvatar = async (req, res) => {  
+  const { userId, avatarUrl } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.avatar = avatarUrl;
+    await user.save();
+
+    res.json({ message: "Avatar updated successfully", avatar: user.avatar });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 module.exports = {
   registerUser,
   loginUser,
+  updateAvatar,
 };

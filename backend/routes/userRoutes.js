@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, loginUser } = require('../controllers/userController');
+const { registerUser, loginUser, updateAvatar } = require('../controllers/userController');
 const { uploadPhoto } = require('../controllers/photoController'); 
 
 const router = express.Router();
@@ -12,4 +12,8 @@ router.post('/login', loginUser);
 
 // @route POST /api/users/upload-photo
 router.post('/upload-photo', uploadPhoto);
-module.exports = router;
+
+// @route POST /api/users/update-avatar
+router.post('/update-avatar', updateAvatar);
+
+module.exports = router;    

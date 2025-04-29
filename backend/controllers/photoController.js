@@ -1,26 +1,18 @@
 const cloudinary = require('../utils/cloudinary');
 
-// @desc Upload a profile photo
-// @route POST /api/users/upload-photo
-// @access Public (later we'll protect it)
 const uploadPhoto = async (req, res) => {
   try {
-    const fileStr = req.body.data; // expecting the image base64 string
+    const fileStr = req.body.data;
 
-    const uploadedResponse = await cloudinary.uploader.upload(fileStr, {
-      upload_preset: 'ml_default', // this preset exists by default in free accounts
-    });
+    console.log('Received file string:', fileStr.slice(0, 100)); // just the first 100 chars
+
+    const uploadedResponse = await cloudinary.uploader.upload(fileStr);
 
     res.json({ url: uploadedResponse.secure_url });
   } catch (err) {
-    console.error("Error uploading image to Cloudinary:", err);
-  
-    if (err.response) {
-      console.error("Cloudinary Response Error:", err.response);
-    }
-  
+    console.error("Error uploading to Cloudinary:", err.response?.data || err.message || err);
     res.status(500).json({ message: 'Something went wrong uploading the image.', error: err.message });
   }
-};      
+};
 
 module.exports = { uploadPhoto };

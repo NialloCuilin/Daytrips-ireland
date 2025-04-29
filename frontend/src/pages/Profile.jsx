@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaUserFriends, FaBookmark, FaMapMarkedAlt, FaMedal } from 'react-icons/fa';
+import axios from 'axios';
 
 // Random pastel color generator
 const getRandomColor = () => {
@@ -12,17 +13,11 @@ const getRandomColor = () => {
 };
 
 function Profile() {
+  const user = JSON.parse(localStorage.getItem('userInfo'));
   const [activeTab, setActiveTab] = useState('daytrips');
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState(user?.avatar || null);
   const [avatarColor, setAvatarColor] = useState('');
   const fileInputRef = useRef(null);
-
-  // Example user info (replace later with real user data)
-  const user = {
-    firstName: 'Niall',
-    lastName: 'Cullen',
-    email: 'niall@example.com',
-  };
 
   useEffect(() => {
     const savedColor = localStorage.getItem('avatarColor');
@@ -43,35 +38,39 @@ function Profile() {
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Preview locally while uploading
-      setAvatar(URL.createObjectURL(file));
-  
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = async () => {
-        try {
-          const base64String = reader.result;
-  
-          const res = await axios.post('http://localhost:5000/api/users/upload-photo', {
-            data: base64String,
-          });
-  
-          console.log('Cloudinary URL:', res.data.url);
-  
-          // Update avatar with the Cloudinary URL (permanent version)
-          setAvatar(res.data.url);
-  
-          // (optional) Save to localStorage if you want it between sessions
-          // localStorage.setItem('avatarUrl', res.data.url);
-  
-        } catch (err) {
-          console.error('Upload failed', err);
-          alert('Image upload failed. Please try again.');
-        }
-      };
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+
+      try {
+        const res = await axios.post(
+          'https://api.cloudinary.com/v1_1/dqrpclqri/image/upload',
+          formData,
+          {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          }
+        );
+
+        const imageUrl = res.data.secure_url;
+        setAvatar(imageUrl);
+
+        // Save avatar URL to your backend
+        await axios.post('http://localhost:5000/api/users/update-avatar', {
+          userId: user._id,
+          avatarUrl: imageUrl,
+        });
+
+        // Update localStorage
+        const updatedUserInfo = { ...user, avatar: imageUrl };
+        localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+
+      } catch (err) {
+        console.error('Upload failed', err.response?.data || err.message);
+        alert('Image upload failed. Please try again.');
+      }
     }
   };
 
@@ -82,7 +81,7 @@ function Profile() {
         {/* Avatar */}
         <div
           onClick={handleAvatarClick}
-          className={`w-32 h-32 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg mb-4 cursor-pointer overflow-hidden ${avatar ? '' : avatarColor}`}
+          className={`w-48 h-48 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg mb-4 cursor-pointer overflow-hidden ${avatar ? '' : avatarColor}`}
         >
           {avatar ? (
             <img
@@ -91,7 +90,7 @@ function Profile() {
               className="w-full h-full object-cover"
             />
           ) : (
-            user.firstName.charAt(0)
+            user?.firstName?.charAt(0)
           )}
         </div>
 
@@ -105,13 +104,12 @@ function Profile() {
         />
 
         {/* User Info */}
-        <h2 className="text-2xl font-bold mb-2">{user.firstName} {user.lastName}</h2>
-        <p className="text-gray-500">{user.email}</p>
+        <h2 className="text-4xl font-bold mb-2">{user?.firstName} {user?.lastName}</h2>
+        <p className="text-gray-500">{user?.email}</p>
       </div>
 
       {/* Tabs */}
       <div className="flex justify-center space-x-6 mb-10">
-        {/* Repeat your tab code here */}
         <button
           onClick={() => setActiveTab('daytrips')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-full ${activeTab === 'daytrips' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}
