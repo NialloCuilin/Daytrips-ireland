@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom';
+import { LoadScript } from '@react-google-maps/api';
 import React from 'react';
-import ReactDOM from 'react-dom/client';
 import './App.css'
 import Home from './pages/Home';
 import About from './pages/About';
@@ -14,24 +14,28 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CreateDaytrip from './pages/CreateDaytrip';
 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyA3yNr0eqeBW2rjE9LV5kkk7hnJgtVM4Sw'; 
+
 function App() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar/>
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />}/>
-          <Route path="/about" element={<About />}/>
-          <Route path="/daytrips" element={<Daytrips />}/>
-          <Route path="/contact" element={<Contact/>}/>
-          <Route path="/login" element={<Login />}/>
-          <Route path="/signup" element={<Signup />}/>
-          <Route path="/profile" element={<Profile />}/>
-          <Route path="/create-daytrip" element={<CreateDaytrip />} />
-        </Routes>
-      </main> 
-      <Footer/>
-    </div>
+    <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={['places']}>
+      <div className="flex flex-col min-h-screen">
+        <Navbar/>
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />}/>
+            <Route path="/about" element={<About />}/>
+            <Route path="/daytrips" element={<Daytrips />}/>
+            <Route path="/contact" element={<Contact/>}/>
+            <Route path="/login" element={<Login />}/>
+            <Route path="/signup" element={<Signup />}/>
+            <Route path="/profile" element={<Profile />}/>
+            <Route path="/create-daytrip" element={<CreateDaytrip />} />
+          </Routes>
+        </main> 
+        <Footer/>
+      </div>
+    </LoadScript>
   );
 }
 

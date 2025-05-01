@@ -163,6 +163,7 @@ function Profile() {
       </div>
 
       {/* Tab Content */}
+            {/* Daytrips tab*/}
       <div className="bg-white rounded-lg shadow p-6">
         {activeTab === 'daytrips' && (
           <div>
@@ -178,18 +179,21 @@ function Profile() {
             <p>You will see all the daytrips you’ve created here!</p>
           </div>
         )}
+        {/* Saved tab*/}
         {activeTab === 'saved' && (
           <div>
             <h3 className="text-xl font-bold mb-4">Saved Trips</h3>
             <p>These are trips you have bookmarked for later.</p>
           </div>
         )}
+        {/* Achievements tab*/}
         {activeTab === 'achievements' && (
           <div>
             <h3 className="text-xl font-bold mb-4">Achievements</h3>
             <p>Your badges and milestones will show here!</p>
           </div>
         )}
+        {/* Friends tab*/}
         {activeTab === 'friends' && (
           <div>
             <h3 className="text-xl font-bold mb-4">Friends</h3>
@@ -201,12 +205,6 @@ function Profile() {
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full relative">
-              <button
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-                onClick={() => setShowForm(false)}
-              >
-                &times;
-              </button>
               <CreateDaytrip onClose={() => setShowForm(false)} />
             </div>
           </div>
