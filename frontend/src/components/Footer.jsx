@@ -4,7 +4,7 @@ import logo from '../assets/Images/logo1.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-gray-700 py-10 mt-10">
+    <footer className="bg-gray-900 text-gray-700 py-10">
       <div className="w-full px-6 sm:px-8 lg:px-10">
 
         {/* Social + Copyright */}

@@ -3,6 +3,14 @@ import axios from 'axios';
 import { Autocomplete } from '@react-google-maps/api';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import Select from 'react-select'
+import { FaMapMarkedAlt } from "react-icons/fa";
+import { FaMarker } from "react-icons/fa";
+import { FaTags } from "react-icons/fa";
+import { FaMapSigns } from "react-icons/fa";
+import { FaHiking } from "react-icons/fa";
+import { components } from 'react-select';
+import { useDropzone } from 'react-dropzone';
+import { IoMdStopwatch } from "react-icons/io";
 
 function CreateDaytrip({ onClose }) {
   const [form, setForm] = useState({
@@ -13,6 +21,31 @@ function CreateDaytrip({ onClose }) {
     travelType: 'Car',
   });
   const [images, setImages] = useState([]);
+  const onDrop = async (acceptedFiles) => {
+    const uploadedUrls = [];
+  
+    for (let file of acceptedFiles) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+  
+      try {
+        const res = await axios.post('https://api.cloudinary.com/v1_1/dqrpclqri/image/upload', formData);
+        uploadedUrls.push(res.data.secure_url);
+      } catch (err) {
+        console.error('Image upload failed:', err);
+      }
+    }
+  
+    setImages(prev => [...prev, ...uploadedUrls]);
+    setImagePreviews(prev => [...prev, ...uploadedUrls]);
+  };
+  
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: { 'image/*': [] },
+    onDrop,
+  });
+  
   const [imagePreviews, setImagePreviews] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [locationInputs, setLocationInputs] = useState([{ id: Date.now(), ref: null }]);
@@ -88,6 +121,49 @@ function CreateDaytrip({ onClose }) {
     {value: 'Lunch', label: 'Lunch'},
     {value: 'Dinner', label: 'Dinner'},
   ];
+  const durationTags = [
+    {value: '1 hour', label: '1 hour'},
+    {value: '2 hours', label: '2 hours'},
+    {value: '3 hours', label: '3 hours'},
+    {value: '4 hours', label: '4 hours'},
+    {value: '5 hours', label: '5 hours'},
+    {value: '6 hours', label: '6 hours'},
+    {value: '7 hours', label: '7 hours'},
+    {value: '8 hours', label: '8 hours'},
+    {value: '9 hours', label: '9 hours'},
+    {value: '10 hours', label: '10 hours'},
+  ];
+
+  const CountiesPlaceholder = (props) => {
+    return (
+      <components.Placeholder {...props}>
+        <span className="flex items-center gap-2 text-gray-500">
+          <FaMapSigns/>
+          {props.children}
+        </span>
+      </components.Placeholder>
+    );
+  };
+  const tagsPlaceholder = (props) => {
+    return (
+      <components.Placeholder {...props}>
+        <span className="flex items-center gap-2 text-gray-500">
+        < FaTags/>
+          {props.children}
+        </span>
+      </components.Placeholder>
+    );
+  };
+  const durationPlaceholder = (props) => {
+    return (
+      <components.Placeholder {...props}>
+        <span className="flex items-center gap-2 text-gray-500">
+        <IoMdStopwatch />
+          {props.children}
+        </span>
+      </components.Placeholder>
+    );
+  };
 
   const countyStyles = {
     multiValue: (styles) => ({
@@ -135,6 +211,7 @@ function CreateDaytrip({ onClose }) {
 
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedCounties, setSelectedCounties] = useState([]);
+  const [selectedDuration, setSelectedDuration] = useState([]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -210,38 +287,48 @@ function CreateDaytrip({ onClose }) {
        <div className="bg-yellow-50 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
          {/* Close button INSIDE the form container */}
       <button
-        className="absolute top-0 right-1 text-black hover:text-red-500 text-3xl"
+        className="absolute top-1 right-3 text-black hover:text-red-500 text-3xl"
         onClick={onClose}
         type="button"
       >
         &times;
       </button>
-      <h2 className="text-2xl font-bold mb-4 text-center">Create a Daytrip</h2>
+      {/* Form title and icon */}
+      <div className="flex items-center justify-center gap-4 mb-4">
+        <FaHiking className="text-4xl text-black-700" />
+        <h2 className="text-2xl font-bold">Create a Daytrip</h2>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Title input */}
+        <div className="relative">
+          <FaMapMarkedAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            value={form.title}
+            onChange={handleChange}
+            className="w-full pl-10 p-2 border rounded"
+          />
+        </div>
+        {/* Description input */}
+        <div className="relative">
+          <FaMarker className="absolute top-4 left-3 text-black" />
+          <textarea
+            name="description"
+            placeholder="Description"
+            value={form.description}
+            onChange={handleChange}
+            className="w-full pl-10 pt-3 pb-2 pr-3 border rounded"
+          />
+        </div>
 
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={form.title}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />  
-
+        {/* Location inputs with Autocomplete */}  
         {locationInputs.map((input, idx) => (
           <div key={input.id} className="relative mb-2">
             <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-500 z-50" />
-            
-            <Autocomplete
+
+            <Autocomplete 
               onLoad={(autocomplete) => { 
                 locationInputs[idx].ref = autocomplete;
               }}
@@ -256,7 +343,7 @@ function CreateDaytrip({ onClose }) {
             </Autocomplete> 
           </div>
         ))}
-
+        {/* Button to add more location inputs */}
         <button
           type="button"
           onClick={addLocationInput}
@@ -277,61 +364,82 @@ function CreateDaytrip({ onClose }) {
           Add Location
         </button>
 
-        {/* Multi select for counties */}
-        <div className="flex items-center gap-2">
-        <label htmlFor="counties">Select Counties:</label>
-        <Select
-          id="counties"
-          isMulti
-          options={countyTags}
-          value={selectedCounties}
-          onChange={setSelectedCounties}
-          styles={countyStyles}
-          placeholder="Choose counties..."
-        />
-        </div>  
+         {/* Image Upload */}
+         <div {...getRootProps()} className="w-full border-2 border-dashed bg-white border-gray-400 rounded-lg p-6 text-center cursor-pointer hover:border-green-500 transition">
+            <input {...getInputProps()} />
+            {isDragActive ? (
+              <p className="text-green-600 font-medium">Drop the images here...</p>
+            ) : (
+              <p className="text-gray-500">Drag & drop images here, or click to browse</p>
+            )}
+          </div>
 
-        {/* Multi select for tags */}
-        <div className="flex items-center gap-2"> 
-        <label htmlFor="counties">Select Daytrip Tags:</label>
-        <Select
-          id="counties"
-          isMulti
-          options={generalTags}
-          value={selectedTags}
-          onChange={setSelectedTags}
-          styles={generalStyles}
-          placeholder="Choose tags..."
-        />
-        </div>  
-
-        <div className="flex items-center gap-2">
-          <span className="text-black font-medium">Please choose a travel method:</span>
-          <select
-            name="travelType"
-            value={form.travelType}
-            onChange={handleChange}
-            className="p-2 border rounded"
-          >
-            <option>Car</option>
-            <option>Bus</option>
-            <option>Train</option>
-            <option>Bike</option>
-          </select>
-        </div>
-
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="w-full"
-        />
-
-        <div className="flex flex-wrap gap-4 mt-4">
-          {imagePreviews.map((url, idx) => (
-            <img key={idx} src={url} alt="preview" className="w-24 h-24 object-cover rounded" />
-          ))}
+          <div className="flex flex-wrap gap-4 mt-4">
+            {imagePreviews.map((url, idx) => (
+              <div key={idx} className="relative w-24 h-24">
+                <img src={url} alt="preview" className="w-full h-full object-cover rounded" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImagePreviews(prev => prev.filter((_, i) => i !== idx));
+                    setImages(prev => prev.filter((_, i) => i !== idx));
+                  }}
+                  className="absolute top-0 right-0 text-white bg-red-500 rounded-full p-1 text-xs"
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+          </div>
+        <div className="max-w-md mx-auto space-y-4">
+          {/* Subheading */}
+          <h3 className="text-lg font-semibold text-center text-gray-700 mb-2">Daytrip Details</h3>
+          {/* Multi select for counties */}
+          <Select
+            id="counties"
+            isMulti
+            options={countyTags}
+            value={selectedCounties}
+            components={{ Placeholder: CountiesPlaceholder }}
+            onChange={setSelectedCounties}
+            styles={countyStyles}
+            placeholder="Daytrip Counties..."
+          />
+          {/* Multi select for tags */}
+          <Select
+            id="tags"
+            isMulti 
+            options={generalTags}
+            value={selectedTags}
+            components={{ Placeholder: tagsPlaceholder }}
+            onChange={setSelectedTags}
+            styles={generalStyles}
+            placeholder="Daytrip Tags..."
+          />
+           {/* Multi select for duration */}
+           <Select
+            id="duration"
+            isMulti
+            options={durationTags}
+            value={selectedDuration}
+            components={{ Placeholder: durationPlaceholder }}
+            onChange={setSelectedDuration}
+            placeholder="Approximate Duration..."
+          />
+          <div className="block mb-1 font-medium">
+            <span className="text-black font-medium">Please choose a travel method:</span>
+            <select
+              name="travelType"
+              value={form.travelType}
+              onChange={handleChange}
+              className="p-2 border rounded"
+            >
+              <option>Car</option>
+              <option>Bus</option>
+              <option>Train</option>
+              <option>Bike</option>
+            </select>
+          </div>
         </div>
 
         <button type="submit" className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
