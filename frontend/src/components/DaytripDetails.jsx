@@ -6,12 +6,10 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { FaMapMarkedAlt } from "react-icons/fa";
-import { FaMapMarkerAlt } from "react-icons/fa";
-import {FaClock } from 'react-icons/fa';
+import { FaMapMarkedAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { FaClock } from 'react-icons/fa';
 import LocationMap from '../components/LocationMap';
 import { Link } from 'react-router-dom';
-
 
 function DaytripDetails() {
   const { id } = useParams();
@@ -32,13 +30,25 @@ function DaytripDetails() {
 
   if (!daytrip) return <div className="p-6 text-center">Loading...</div>;
 
+  const formatDuration = (durationString) => {
+    const minutes = parseInt(durationString);
+    if (isNaN(minutes)) return durationString;
+  
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+  
+    if (hours === 0) return `${mins} min`;
+    if (mins === 0) return `${hours}h`;
+    return `${hours}h ${mins}m`;
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/*Title, Icon, county tag*/}
       <div className="max-w-4xl mx-auto p-0">
         <div className="mb-0 relative">
           <div className="flex items-baseline justify-center gap-4">
-            <FaMapMarkerAlt className="text-3xl text-red-700" />
+            <FaMapMarkerAlt className="text-3xl text-red-600" />
             <h1 className="text-3xl font-bold text-center mb-4">{daytrip.title}</h1>
           </div>
           <div className="absolute right-0 top-3">
@@ -50,6 +60,7 @@ function DaytripDetails() {
           </div>
         </div>
       </div>
+
       {/* Image Swiper */}
       {daytrip.images?.length > 0 && (
         <Swiper
@@ -62,7 +73,7 @@ function DaytripDetails() {
         >
           {daytrip.images.map((img, idx) => (
             <SwiperSlide key={idx}>
-              <img src={img} alt={`Slide ${idx}`} className="w-full h- object-cover rounded" />
+              <img src={img} alt={`Slide ${idx}`} className="w-full object-cover rounded" />
             </SwiperSlide>
           ))}
         </Swiper>
@@ -83,7 +94,7 @@ function DaytripDetails() {
         <span>{new Date(daytrip.createdAt).toLocaleDateString()}</span>
       </div>
 
-      {/* Description */}
+      {/* Main Description */}
       <p className="text-gray-800 mb-6 text-left">{daytrip.description}</p>
 
       {/* Locations */}
@@ -95,46 +106,58 @@ function DaytripDetails() {
             <h1 className="text-3xl font-semibold text-black">Itinerary</h1>
           </div>
 
-          {/* Duration below */}
+          {/* Duration */}
           <div className="flex items-center gap-1 text-gray-500">
             <FaClock className="text-lg" />
-            <span>{daytrip.duration}</span>
+            <span>{formatDuration(daytrip.duration)}</span>
           </div>
         </div>
-        {/*Map */}
+
+        {/* Map */}
         {daytrip.locations?.length > 0 && (
           <LocationMap locations={daytrip.locations} />
         )}
-        <ul className="space-y-4 text-gray-700 mt-4">
-          {daytrip.locations?.map((loc, i) => {
-            if (typeof loc === 'string') {
-              return (
-                <li key={i}>
-                  <span className="font-semibold text-black">{i + 1}. {loc}</span>
-                </li>
-              );
-            }
 
+        {/* Location list with descriptions */}
+        <ul className="space-y-4 text-gray-700 mt-4">
+        {daytrip.locations?.map((loc, i) => {
+          if (typeof loc === 'string') {
             return (
               <li key={i}>
-                <span className="block text-base font-semibold text-black">
-                  {i + 1}. {loc.name}
-                </span>
-                <span className="text-sm text-gray-600">({loc.address})</span>
+                <span className="font-semibold text-black">{i + 1}. {loc}</span>
               </li>
             );
-          })}
+          }
+
+          return (
+            <li key={i} className="space-y-1">
+              <div className="text-base font-semibold text-black">{i + 1}. {loc.name}</div>
+              <div className="text-sm text-gray-600 italic">{loc.address}</div>
+
+              {loc.description && (
+                <div className="text-gray-700 pl-2 border-l-4 border-gray-300">
+                  {loc.description}
+                </div>
+              )}
+              {loc.timeSpent && (
+                <div className="text-sm text-green-700 mt-1">
+                  ⏱️ Duration at this location: {loc.timeSpent} minutes
+                </div>
+              )}
+            </li>
+          );
+        })}
         </ul>
       </div>
 
-      {/* Tags */} 
-        <div className="flex flex-wrap gap-2 justify-center">
-          {daytrip.tags?.map((tag, i) => (
-            <span key={i} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">
-              {tag}
-            </span>
-          ))}
-        </div>
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 justify-center">
+        {daytrip.tags?.map((tag, i) => (
+          <span key={i} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm">
+            {tag}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

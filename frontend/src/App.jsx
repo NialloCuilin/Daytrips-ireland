@@ -33,6 +33,7 @@ function App() {
             <Route path="/profile" element={<Profile />}/>
             <Route path="/create-daytrip" element={<CreateDaytrip />} />
             <Route path="/daytrips/:id" element={<DaytripDetails />} />
+            <Route path="/profile/:userId" element={<Profile />} />
           </Routes>
         </main> 
         <Footer/> 

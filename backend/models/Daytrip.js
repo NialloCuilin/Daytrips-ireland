@@ -21,18 +21,16 @@ const daytripSchema = new mongoose.Schema({
   locations: [{
     name: String,
     address: String,
-    lat: Number,
+    lat: Number,  
     lng: Number,
+    description: String,
+    timeSpent: Number,
   }],
   images: [String], // array of Cloudinary URLs
   countyTags: [String], // e.g., ["County Derry", "County Antrim"]  
   tags: [String], // e.g., ["Hike", "Waterfall", "Birdwatching"]
-  duration: [String],
-  travelType: {
-    type: String,
-    enum: ['Car', 'Bus', 'Train', 'Bike'],
-    required: true,
-  },
+  duration: String,
+  travelType: [String], // e.g., ["Car", "Bus", "Bike"]
 });
 
 const Daytrip = mongoose.model('Daytrip', daytripSchema);

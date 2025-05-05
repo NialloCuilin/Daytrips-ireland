@@ -11,6 +11,7 @@ import { FaHiking } from "react-icons/fa";
 import { components } from 'react-select';
 import { useDropzone } from 'react-dropzone';
 import { IoMdStopwatch } from "react-icons/io";
+import { Loader } from "@googlemaps/js-api-loader";
 
 function CreateDaytrip({ onClose }) {
   const [form, setForm] = useState({
@@ -46,7 +47,9 @@ function CreateDaytrip({ onClose }) {
   });
   const [imagePreviews, setImagePreviews] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
-  const [locationInputs, setLocationInputs] = useState([{ id: Date.now(), ref: null }]);
+  const [locationInputs, setLocationInputs] = useState([
+    { id: Date.now(), ref: null, description: '', timeSpent: '30' } // default to 30 mins
+  ]);
   const countyTags = [ 
     {value: 'Antrim', label: 'Antrim'},{value: 'Armagh', label: 'Armagh'},{value: 'Carlow', label: 'Carlow'},
     {value: 'Cavan', label: 'Cavan'},{value: 'Clare', label: 'Clare'},{value: 'Cork', label: 'Cork'},
@@ -80,6 +83,10 @@ function CreateDaytrip({ onClose }) {
     {value: '7 hours', label: '7 hours'},{value: '8 hours', label: '8 hours'},{value: '9 hours', label: '9 hours'},
     {value: '10 hours', label: '10 hours'},
   ];
+  const travelTypes = [ 
+    {value: 'Car', label: 'Car'},{value: 'Bus', label: 'Bus'},{value: 'Train', label: 'Train'},
+    {value: 'Bike', label: 'Bike'},{value: 'Walk', label: 'Walk'},{value: 'Ferry', label: 'Ferry'}
+  ]
   const CountiesPlaceholder = (props) => {
     return (
       <components.Placeholder {...props}>
@@ -155,9 +162,84 @@ function CreateDaytrip({ onClose }) {
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedCounties, setSelectedCounties] = useState([]); 
   const [selectedDuration, setSelectedDuration] = useState([]);
+  const [selectedTravelType, setSelectedTravelType] = useState([]);
+  const removeLocationInput = (index) => {
+    setLocationInputs((prev) => prev.filter((_, i) => i !== index));
+    setSelectedPlaces((prev) => prev.filter((_, i) => i !== index));
+  };
+  const calculateTripDuration = async () => {
+    const apiKey = 'AIzaSyA3yNr0eqeBW2rjE9LV5kkk7hnJgtVM4Sw';
+    const loader = new Loader({
+      apiKey,
+      libraries: ['places']
+    });
+  
+    await loader.load();
+    const { google } = window;
+  
+    const coords = selectedPlaces.map(p => new google.maps.LatLng(p.lat, p.lng));
+    const totalVisitMinutes = locationInputs.reduce((sum, l) => sum + Number(l.timeSpent || 0), 0);
+
+
+  
+    if (coords.length < 2) {
+      return totalVisitMinutes;
+    }
+  
+    return new Promise((resolve, reject) => {
+      const service = new google.maps.DistanceMatrixService();
+      let totalTravelSeconds = 0;
+  
+      const promises = [];
+  
+      for (let i = 0; i < coords.length - 1; i++) {
+        promises.push(new Promise((res, rej) => {
+          service.getDistanceMatrix(
+            {
+              origins: [coords[i]],
+              destinations: [coords[i + 1]],
+              travelMode: google.maps.TravelMode.DRIVING, // Or WALKING, etc.
+            },
+            (response, status) => {
+              if (status !== "OK") return rej(status);
+              const element = response.rows[0].elements[0];
+              if (element.status === "OK") {
+                res(element.duration.value); // in seconds
+              } else {
+                res(0);
+              }
+            }
+          );
+        }));
+      }
+  
+      Promise.all(promises).then(durations => {
+        totalTravelSeconds = durations.reduce((sum, s) => sum + s, 0);
+        const totalMinutes = Math.round(totalTravelSeconds / 60) + totalVisitMinutes;
+        resolve(totalMinutes);
+      }).catch(reject);
+    });
+  };
+  
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const handleDescriptionChange = (index, value) => {
+    setLocationInputs((prev) => {
+      const updated = [...prev];
+      updated[index].description = value;
+      return updated;
+    });
+  };
+  const handleTimeSpentChange = (index, value) => {
+    setLocationInputs((prev) => {
+      const updated = [...prev];
+      updated[index].timeSpent = value;
+      return updated;
+    });
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem('userInfo'));
@@ -165,20 +247,23 @@ function CreateDaytrip({ onClose }) {
       description: form.description,
       travelType: form.travelType,
     });
+    const totalDuration = await calculateTripDuration();
    try {
     await axios.post('http://localhost:5000/api/daytrips/create', {
       title: form.title,
       description: form.description,
-      travelType: form.travelType,
-      locations: selectedPlaces.map(place => ({
+      travelType: selectedTravelType.map(type => type.value),
+      locations: selectedPlaces.map((place, idx) => ({
         name: place.name,
         address: place.address,
         lat: place.lat,
         lng: place.lng,
-      })),
+        description: locationInputs[idx]?.description || '',
+        timeSpent: parseInt(locationInputs[idx]?.timeSpent) || 0
+        })),
       tags: selectedTags.map(tag => tag.value),
       countyTags: selectedCounties.map(county => county.value),
-      duration: selectedDuration?.value || '',
+      duration: `${totalDuration} minutes`,
       images,
       author: user._id,
     });
@@ -204,7 +289,10 @@ function CreateDaytrip({ onClose }) {
     setSelectedPlaces(updatedPlaces);
   };
   const addLocationInput = () => {
-    setLocationInputs([...locationInputs, { id: Date.now(), ref: null }]);
+    setLocationInputs([
+      ...locationInputs,
+      { id: Date.now(), ref: null, description: '', timeSpent: '30' } // ✅ DEFAULT HERE
+    ]);
   };
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -248,23 +336,61 @@ function CreateDaytrip({ onClose }) {
         </div>
         {/* Location inputs with Autocomplete */}  
         {locationInputs.map((input, idx) => (
-          <div key={input.id} className="relative mb-2">
-            <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-500 z-50" />
-            <Autocomplete 
-              onLoad={(autocomplete) => { 
-                locationInputs[idx].ref = autocomplete;
-              }}
-              onPlaceChanged={() => handlePlaceChanged(idx)}
-            >
-              {/* Only input inside Autocomplete */}
+          <div key={input.id} className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm space-y-3 mb-4">
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-500 z-50" />
+                <Autocomplete 
+                  onLoad={(autocomplete) => {
+                    locationInputs[idx].ref = autocomplete;
+                  }}
+                  onPlaceChanged={() => handlePlaceChanged(idx)}
+                >
+                  <input
+                    type="text"
+                    placeholder={`Location ${idx + 1}`}
+                    className="w-full pl-10 pr-8 p-2 border rounded"
+                  />
+                </Autocomplete>
+
+                {locationInputs.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeLocationInput(idx)}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-red-500 hover:text-red-700 text-xl"
+                    title="Remove location"
+                  >
+                    &times;
+                  </button>
+                )}
+              </div>
+              
+            </div>
+
+            <div className="flex items-center gap-3">
+              <label className="text-3x-l text-gray-600 whitespace-nowrap">
+                Duration of Stay at Location (minutes):
+              </label>
               <input
-                type="text"
-                placeholder={`Location ${idx + 1}`}
-                className="w-full pl-10 p-2 border rounded relative z-20"
+                type="number"
+                min="0"
+                value={input.timeSpent}
+                onChange={(e) => handleTimeSpentChange(idx, e.target.value)}
+                className="flex-1 p-2 border rounded"
               />
-            </Autocomplete> 
+            </div>
+
+            <div>
+              <textarea
+                placeholder="Description for this location... Any advice or tips?"
+                value={input.description}
+                onChange={(e) => handleDescriptionChange(idx, e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+            </div>
           </div>
         ))}
+
         {/* Button to add more location inputs */}
         <button
           type="button"
@@ -336,29 +462,16 @@ function CreateDaytrip({ onClose }) {
             styles={generalStyles}
             placeholder="Daytrip Tags..."
           />
-           {/* Multi select for duration */}
-           <Select
-            id="duration"
-            options={durationTags}
-            value={selectedDuration}
-            components={{ Placeholder: durationPlaceholder }}
-            onChange={setSelectedDuration}
-            placeholder="Approximate Duration..."
+          {/* Select for travel type */}
+          <Select
+            id="travelType"
+            isMulti
+            options={travelTypes}
+            value={selectedTravelType}
+            onChange={setSelectedTravelType}
+            placeholder="Travel Type..."
           />
-          <div className="block mb-1 font-medium">
-            <span className="text-black font-medium">Please choose a travel method:</span>
-            <select
-              name="travelType"
-              value={form.travelType}
-              onChange={handleChange}
-              className="p-2 border rounded"
-            >
-              <option>Car</option>
-              <option>Bus</option>
-              <option>Train</option>
-              <option>Bike</option>
-            </select>
-          </div>
+          
         </div>
         <button type="submit" className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
           Submit Daytrip

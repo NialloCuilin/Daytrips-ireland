@@ -69,7 +69,6 @@ const getDaytripById = async (req, res) => {
   }
 };
 
-
 module.exports = { 
   createDaytrip,
   getUserDaytrips,
