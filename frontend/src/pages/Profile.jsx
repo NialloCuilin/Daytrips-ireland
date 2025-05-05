@@ -2,16 +2,17 @@ import { useState, useEffect, useRef } from 'react';
 import { FaUserFriends, FaBookmark, FaMapMarkedAlt, FaMedal } from 'react-icons/fa';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import CreateDaytrip from './CreateDaytrip';
+import MyDaytrips from '../components/profile/MyDaytrips';
+import DaytripCard from '../components/DaytripCard';
 import axios from 'axios';
 
-
-// Random pastel color generator
+// Random color generator
 const getRandomColor = () => {
   const colors = [
     'bg-red-700', 'bg-green-700', 'bg-blue-700',
     'bg-yellow-700', 'bg-purple-700', 'bg-pink-700',
     'bg-indigo-700', 'bg-teal-700'
-  ];
+  ];  
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
@@ -163,22 +164,12 @@ function Profile() {
       </div>
 
       {/* Tab Content */}
-            {/* Daytrips tab*/}
+        {/* Daytrips tab*/}
       <div className="bg-white rounded-lg shadow p-6">
         {activeTab === 'daytrips' && (
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Your Created Daytrips</h3>
-              <button
-                onClick={() => setShowForm(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                + Create Daytrip
-              </button>
-            </div>
-            <p>You will see all the daytrips you’ve created here!</p>
-          </div>
+          <MyDaytrips userId={user?._id} onCreate={() => setShowForm(true)} />
         )}
+
         {/* Saved tab*/}
         {activeTab === 'saved' && (
           <div>

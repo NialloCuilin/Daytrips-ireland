@@ -40,100 +40,46 @@ function CreateDaytrip({ onClose }) {
     setImages(prev => [...prev, ...uploadedUrls]);
     setImagePreviews(prev => [...prev, ...uploadedUrls]);
   };
-  
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'image/*': [] },
     onDrop,
   });
-  
   const [imagePreviews, setImagePreviews] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [locationInputs, setLocationInputs] = useState([{ id: Date.now(), ref: null }]);
   const countyTags = [ 
-    {value: 'Antrim', label: 'Antrim'},
-    {value: 'Armagh', label: 'Armagh'},
-    {value: 'Carlow', label: 'Carlow'},
-    {value: 'Cavan', label: 'Cavan'},
-    {value: 'Clare', label: 'Clare'},
-    {value: 'Cork', label: 'Cork'},
-    {value: 'Derry', label: 'Derry'},
-    {value: 'Donegal', label: 'Donegal'},
-    {value: 'Down', label: 'Down'},
-    {value: 'Dublin', label: 'Dublin'},
-    {value: 'Fermanagh', label: 'Fermanagh'}, 
-    {value: 'Galway', label: 'Galway'}, 
-    {value: 'Kerry', label: 'Kerry'}, 
-    {value: 'Kildare', label: 'Kildare'}, 
-    {value: 'Kilkenny', label: 'Kilkenny'},
-    {value: 'Laois', label: 'Laois'},
-    {value: 'Leitrim', label: 'Leitrim'},
-    {value: 'Limerick', label: 'Limerick'},
-    {value: 'Longford', label: 'Longford'},
-    {value: 'Louth', label: 'Louth'},
-    {value: 'Mayo', label: 'Mayo'},
-    {value: 'Meath', label: 'Meath'},
-    {value: 'Monaghan', label: 'Monaghan'},
-    {value: 'Offaly', label: 'Offaly'},
-    {value: 'Roscommon', label: 'Roscommon'},
-    {value: 'Sligo', label: 'Sligo'},
-    {value: 'Tipperary', label: 'Tipperary'},
-    {value: 'Tyrone', label: 'Tyrone'},
-    {value: 'Waterford', label: 'Waterford'},
-    {value: 'Westmeath', label: 'Westmeath'},
-    {value: 'Wexford', label: 'Wexford'},
-    {value: 'Wicklow', label: 'Wicklow'},
+    {value: 'Antrim', label: 'Antrim'},{value: 'Armagh', label: 'Armagh'},{value: 'Carlow', label: 'Carlow'},
+    {value: 'Cavan', label: 'Cavan'},{value: 'Clare', label: 'Clare'},{value: 'Cork', label: 'Cork'},
+    {value: 'Derry', label: 'Derry'},{value: 'Donegal', label: 'Donegal'},{value: 'Down', label: 'Down'},
+    {value: 'Dublin', label: 'Dublin'},{value: 'Fermanagh', label: 'Fermanagh'}, {value: 'Galway', label: 'Galway'}, 
+    {value: 'Kerry', label: 'Kerry'}, {value: 'Kildare', label: 'Kildare'}, {value: 'Kilkenny', label: 'Kilkenny'},
+    {value: 'Laois', label: 'Laois'},{value: 'Leitrim', label: 'Leitrim'},{value: 'Limerick', label: 'Limerick'},
+    {value: 'Longford', label: 'Longford'},{value: 'Louth', label: 'Louth'},{value: 'Mayo', label: 'Mayo'},
+    {value: 'Meath', label: 'Meath'},{value: 'Monaghan', label: 'Monaghan'},{value: 'Offaly', label: 'Offaly'},
+    {value: 'Roscommon', label: 'Roscommon'},{value: 'Sligo', label: 'Sligo'},{value: 'Tipperary', label: 'Tipperary'},
+    {value: 'Tyrone', label: 'Tyrone'},{value: 'Waterford', label: 'Waterford'},{value: 'Westmeath', label: 'Westmeath'},
+    {value: 'Wexford', label: 'Wexford'},{value: 'Wicklow', label: 'Wicklow'},
   ];
   const generalTags =[
-    {value: 'Beach', label: 'Beach'},
-    {value: 'Forest', label: 'Forest'},
-    {value: 'River', label: 'River'},
-    {value: 'Mountain', label: 'Mountain'},
-    {value: 'Bog', label: 'Bog'},
-    {value: 'Lough', label: 'Lough'},
-    {value: 'Cave', label: 'Cave'},
-    {value: 'Cliff', label: 'Cliff'},
-    {value: 'Waterfall', label: 'Waterfall'},
-    {value: 'Glen', label: 'Glen'},
-    {value: 'Island', label: 'Island'},
-    {value: 'Park', label: 'Park'},
-    {value: 'Village', label: 'Village'},
-    {value: 'Town', label: 'Town'},
-    {value: 'City', label: 'City'},
-    {value: 'Castle', label: 'Castle'},
-    {value: 'Fort', label: 'Fort'},
-    {value: 'Ancient', label: 'Ancient'},
-    {value: 'Bar', label: 'Bar'},
-    {value: 'Reastaurant', label: 'Reastaurant'},
-    {value: 'Cafe', label: 'Cafe'},
-    {value: 'Meuseum', label: 'Meuseum'},
-    {value: 'Zoo', label: 'Zoo'},
-    {value: 'Acquarium', label: 'Acquarium'},
-    {value: 'Lighthouse', label: 'Lighthouse'},
-    {value: 'Birdwatching', label: 'Birdwatching'},
-    {value: 'Hike', label: 'Hike'},
-    {value: 'Walk', label: 'Walk'},
-    {value: 'Cycle', label: 'Cycle'},
-    {value: 'Sightseeing', label: 'Sightseeing'} ,
-    {value: 'Coffee', label: 'Coffee'},
-    {value: 'Pint', label: 'Pint'},
-    {value: 'Ice-Cream', label: 'Ice-Cream'},
-    {value: 'Breakfast', label: 'Breakfast'},
-    {value: 'Lunch', label: 'Lunch'},
-    {value: 'Dinner', label: 'Dinner'},
+    {value: 'Beach', label: 'Beach'},{value: 'Forest', label: 'Forest'},{value: 'River', label: 'River'},
+    {value: 'Mountain', label: 'Mountain'},{value: 'Bog', label: 'Bog'},{value: 'Lough', label: 'Lough'},
+    {value: 'Cave', label: 'Cave'},{value: 'Cliffs', label: 'Cliffs'},{value: 'Waterfall', label: 'Waterfall'},
+    {value: 'Glen', label: 'Glen'},{value: 'Island', label: 'Island'},{value: 'Park', label: 'Park'},
+    {value: 'Village', label: 'Village'},{value: 'Town', label: 'Town'},{value: 'City', label: 'City'},
+    {value: 'Castle', label: 'Castle'},{value: 'Fort', label: 'Fort'},{value: 'Ancient', label: 'Ancient'},
+    {value: 'Bar', label: 'Bar'},{value: 'Reastaurant', label: 'Reastaurant'},{value: 'Cafe', label: 'Cafe'},
+    {value: 'Museum', label: 'Museum'},{value: 'Zoo', label: 'Zoo'},{value: 'Acquarium', label: 'Acquarium'},
+    {value: 'Lighthouse', label: 'Lighthouse'},{value: 'Birdwatching', label: 'Birdwatching'},{value: 'Hike', label: 'Hike'},
+    {value: 'Walk', label: 'Walk'},{value: 'Cycle', label: 'Cycle'},{value: 'Sightseeing', label: 'Sightseeing'} ,
+    {value: 'Coffee', label: 'Coffee'},{value: 'Pint', label: 'Pint'},{value: 'Ice-Cream', label: 'Ice-Cream'},
+    {value: 'Breakfast', label: 'Breakfast'},{value: 'Lunch', label: 'Lunch'},{value: 'Dinner', label: 'Dinner'},
   ];
   const durationTags = [
-    {value: '1 hour', label: '1 hour'},
-    {value: '2 hours', label: '2 hours'},
-    {value: '3 hours', label: '3 hours'},
-    {value: '4 hours', label: '4 hours'},
-    {value: '5 hours', label: '5 hours'},
-    {value: '6 hours', label: '6 hours'},
-    {value: '7 hours', label: '7 hours'},
-    {value: '8 hours', label: '8 hours'},
-    {value: '9 hours', label: '9 hours'},
+    {value: '1 hour', label: '1 hour'},{value: '2 hours', label: '2 hours'},{value: '3 hours', label: '3 hours'},
+    {value: '4 hours', label: '4 hours'},{value: '5 hours', label: '5 hours'},{value: '6 hours', label: '6 hours'},
+    {value: '7 hours', label: '7 hours'},{value: '8 hours', label: '8 hours'},{value: '9 hours', label: '9 hours'},
     {value: '10 hours', label: '10 hours'},
   ];
-
   const CountiesPlaceholder = (props) => {
     return (
       <components.Placeholder {...props}>
@@ -164,7 +110,6 @@ function CreateDaytrip({ onClose }) {
       </components.Placeholder>
     );
   };
-
   const countyStyles = {
     multiValue: (styles) => ({
       ...styles,
@@ -186,7 +131,6 @@ function CreateDaytrip({ onClose }) {
       },
     }),
   };
-
   const generalStyles = {
     multiValue: (styles) => ({
       ...styles,
@@ -208,51 +152,36 @@ function CreateDaytrip({ onClose }) {
       },
     }),
   };
-
   const [selectedTags, setSelectedTags] = useState([]);
-  const [selectedCounties, setSelectedCounties] = useState([]);
+  const [selectedCounties, setSelectedCounties] = useState([]); 
   const [selectedDuration, setSelectedDuration] = useState([]);
-
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
-  const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const uploadedUrls = [];
-
-    for (let file of files) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'ml_default');
-
-      try {
-        const res = await axios.post('https://api.cloudinary.com/v1_1/dqrpclqri/image/upload', formData);
-        uploadedUrls.push(res.data.secure_url);
-      } catch (err) {
-        console.error('Image upload failed:', err);
-      }
-    }
-
-    setImages(uploadedUrls);
-    setImagePreviews(uploadedUrls);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem('userInfo'));
-
-    try {
-      await axios.post('http://localhost:5000/api/daytrips/create', {
-        title: form.title,
-        description: form.description,
-        locations: selectedPlaces.map((place) => place.address),
-        tags: selectedTags,
-        countyTags: selectedCounties,
-        images,
-        author: user._id,
-      });
-
+    console.log("SUBMITTING:", {
+      description: form.description,
+      travelType: form.travelType,
+    });
+   try {
+    await axios.post('http://localhost:5000/api/daytrips/create', {
+      title: form.title,
+      description: form.description,
+      travelType: form.travelType,
+      locations: selectedPlaces.map(place => ({
+        name: place.name,
+        address: place.address,
+        lat: place.lat,
+        lng: place.lng,
+      })),
+      tags: selectedTags.map(tag => tag.value),
+      countyTags: selectedCounties.map(county => county.value),
+      duration: selectedDuration?.value || '',
+      images,
+      author: user._id,
+    });
       alert('Daytrip created successfully!');
       if (onClose) onClose(); // Close modal if applicable
     } catch (err) {
@@ -260,28 +189,23 @@ function CreateDaytrip({ onClose }) {
       alert('Failed to create daytrip.');
     }
   };
-
   const handlePlaceChanged = (index) => {
     const input = locationInputs[index];
     const place = input.ref?.getPlace();
     if (!place) return;
-
     const location = {
       name: place.name,
       address: place.formatted_address,
       lat: place.geometry.location.lat(),
       lng: place.geometry.location.lng(),
     };
-
     const updatedPlaces = [...selectedPlaces];
     updatedPlaces[index] = location;
     setSelectedPlaces(updatedPlaces);
   };
-
   const addLocationInput = () => {
     setLocationInputs([...locationInputs, { id: Date.now(), ref: null }]);
   };
-
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
        <div className="bg-yellow-50 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
@@ -322,12 +246,10 @@ function CreateDaytrip({ onClose }) {
             className="w-full pl-10 pt-3 pb-2 pr-3 border rounded"
           />
         </div>
-
         {/* Location inputs with Autocomplete */}  
         {locationInputs.map((input, idx) => (
           <div key={input.id} className="relative mb-2">
             <FaMapMarkerAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-red-500 z-50" />
-
             <Autocomplete 
               onLoad={(autocomplete) => { 
                 locationInputs[idx].ref = autocomplete;
@@ -363,7 +285,6 @@ function CreateDaytrip({ onClose }) {
           </svg>
           Add Location
         </button>
-
          {/* Image Upload */}
          <div {...getRootProps()} className="w-full border-2 border-dashed bg-white border-gray-400 rounded-lg p-6 text-center cursor-pointer hover:border-green-500 transition">
             <input {...getInputProps()} />
@@ -373,7 +294,6 @@ function CreateDaytrip({ onClose }) {
               <p className="text-gray-500">Drag & drop images here, or click to browse</p>
             )}
           </div>
-
           <div className="flex flex-wrap gap-4 mt-4">
             {imagePreviews.map((url, idx) => (
               <div key={idx} className="relative w-24 h-24">
@@ -419,7 +339,6 @@ function CreateDaytrip({ onClose }) {
            {/* Multi select for duration */}
            <Select
             id="duration"
-            isMulti
             options={durationTags}
             value={selectedDuration}
             components={{ Placeholder: durationPlaceholder }}
@@ -441,7 +360,6 @@ function CreateDaytrip({ onClose }) {
             </select>
           </div>
         </div>
-
         <button type="submit" className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
           Submit Daytrip
         </button>

@@ -13,6 +13,7 @@ import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CreateDaytrip from './pages/CreateDaytrip';
+import DaytripDetails from './components/DaytripDetails';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyA3yNr0eqeBW2rjE9LV5kkk7hnJgtVM4Sw'; 
 
@@ -31,9 +32,10 @@ function App() {
             <Route path="/signup" element={<Signup />}/>
             <Route path="/profile" element={<Profile />}/>
             <Route path="/create-daytrip" element={<CreateDaytrip />} />
+            <Route path="/daytrips/:id" element={<DaytripDetails />} />
           </Routes>
         </main> 
-        <Footer/>
+        <Footer/> 
       </div>
     </LoadScript>
   );

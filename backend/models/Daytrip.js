@@ -18,13 +18,19 @@ const daytripSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  locations: [String], // e.g., ["Coffee Shop", "Waterfall"]
+  locations: [{
+    name: String,
+    address: String,
+    lat: Number,
+    lng: Number,
+  }],
   images: [String], // array of Cloudinary URLs
-  countyTags: [String], // e.g., ["County Derry", "County Antrim"]
+  countyTags: [String], // e.g., ["County Derry", "County Antrim"]  
   tags: [String], // e.g., ["Hike", "Waterfall", "Birdwatching"]
+  duration: [String],
   travelType: {
     type: String,
-    enum: ['Car', 'Bus', 'Train'],
+    enum: ['Car', 'Bus', 'Train', 'Bike'],
     required: true,
   },
 });
