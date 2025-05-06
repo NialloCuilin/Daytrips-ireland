@@ -38,14 +38,21 @@ const createDaytrip = async (req, res) => {
 const getUserDaytrips = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const daytrips = await Daytrip.find({ author: new mongoose.Types.ObjectId(userId) });
+
+    // ✅ Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid user ID format' });
+    }
+
+    // ✅ Query with string instead of forcing ObjectId instance
+    const daytrips = await Daytrip.find({ author: userId });
+
     res.json(daytrips);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch user daytrips' });
+    console.error('getUserDaytrips error:', err.message, err.stack);
+    res.status(500).json({ error: 'Failed to fetch user daytrips', details: err.message });;
   }
 };
-
 // GET /api/daytrips
 const getAllDaytrips = async (req, res) => {
   try {
