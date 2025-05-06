@@ -7,6 +7,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { FaMapMarkedAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { FaClock } from 'react-icons/fa';
 import LocationMap from '../components/LocationMap';
 import { Link } from 'react-router-dom';
@@ -14,12 +15,25 @@ import { Link } from 'react-router-dom';
 function DaytripDetails() {
   const { id } = useParams();
   const [daytrip, setDaytrip] = useState(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const user = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
     const fetchDaytrip = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/api/daytrips/${id}`);
         setDaytrip(res.data);
+        if (user) {
+          axios
+            .get(`/api/users/${user._id}/saved-daytrips`, {
+              headers: { Authorization: `Bearer ${user.token}` },
+            })
+            .then((res2) => {
+              const saved = res2.data.some((savedTrip) => savedTrip._id === id);
+              setIsSaved(saved);
+            })
+            .catch((err) => console.error("Failed to check saved state:", err));
+        }
       } catch (err) {
         console.error("Failed to load daytrip details", err);
       }
@@ -29,6 +43,25 @@ function DaytripDetails() {
   }, [id]);
 
   if (!daytrip) return <div className="p-6 text-center">Loading...</div>;
+  
+  const toggleSave = async () => {
+    if (!user) return;
+  
+    try {
+      if (isSaved) {
+        await axios.delete(`/api/users/unsave-daytrip/${id}`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+      } else {
+        await axios.post(`/api/users/save-daytrip/${id}`, null, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+      }
+      setIsSaved(!isSaved);
+    } catch (err) {
+      console.error("Failed to toggle save:", err);
+    }
+  };
 
   const formatDuration = (durationString) => {
     const minutes = parseInt(durationString);
@@ -44,9 +77,11 @@ function DaytripDetails() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      
       {/*Title, Icon, county tag*/}
       <div className="max-w-4xl mx-auto p-0">
         <div className="mb-0 relative">
+        
           <div className="flex items-baseline justify-center gap-4">
             <FaMapMarkerAlt className="text-3xl text-red-600" />
             <h1 className="text-3xl font-bold text-center mb-4">{daytrip.title}</h1>
@@ -150,6 +185,8 @@ function DaytripDetails() {
         </ul>
       </div>
 
+    
+
       {/* Tags */}
       <div className="flex flex-wrap gap-2 justify-center">
         {daytrip.tags?.map((tag, i) => (
@@ -157,7 +194,16 @@ function DaytripDetails() {
             {tag}
           </span>
         ))}
-      </div>
+      </div> 
+      {/* Save button */}
+       <button
+        onClick={toggleSave}
+        className="flex items-center gap-2 mb-4 mt-6 text-gray-600 hover:text-black border px-4 py-2 rounded shadow"
+        title={isSaved ? "Unsave this daytrip" : "Save this daytrip"}
+      >
+        {isSaved ? <FaBookmark /> : <FaRegBookmark />}
+        {isSaved ? "Saved" : "Save this daytrip"}
+      </button>
     </div>
   );
 }

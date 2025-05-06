@@ -1,6 +1,14 @@
 const express = require('express');
-const { registerUser, loginUser, updateAvatar } = require('../controllers/userController');
-const { uploadPhoto } = require('../controllers/photoController'); 
+const { protect } = require('../middleware/authMiddleware');
+const { uploadPhoto } = require('../controllers/photoController');
+const {
+    registerUser,
+    loginUser,
+    updateAvatar,
+    saveDaytrip,
+    unsaveDaytrip,
+    getSavedDaytrips
+  } = require('../controllers/userController'); 
 
 const router = express.Router();
 
@@ -15,5 +23,15 @@ router.post('/upload-photo', uploadPhoto);
 
 // @route POST /api/users/update-avatar
 router.post('/update-avatar', updateAvatar);
+
+// Save a daytrip
+router.post('/save-daytrip/:daytripId', protect, saveDaytrip);
+
+// Unsave a daytrip
+router.delete('/unsave-daytrip/:daytripId', protect, unsaveDaytrip);
+
+// Get saved daytrips
+router.get('/:userId/saved-daytrips', protect, getSavedDaytrips);
+
 
 module.exports = router;    

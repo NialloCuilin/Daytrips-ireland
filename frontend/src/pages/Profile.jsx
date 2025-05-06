@@ -3,6 +3,7 @@ import { FaUserFriends, FaBookmark, FaMapMarkedAlt, FaMedal } from 'react-icons/
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import CreateDaytrip from './CreateDaytrip';
 import MyDaytrips from '../components/profile/MyDaytrips';
+import SavedDaytrips from '../components/profile/SavedDaytrips';
 import DaytripCard from '../components/DaytripCard';
 import axios from 'axios';
 
@@ -171,12 +172,7 @@ function Profile() {
         )}
 
         {/* Saved tab*/}
-        {activeTab === 'saved' && (
-          <div>
-            <h3 className="text-xl font-bold mb-4">Saved Trips</h3>
-            <p>These are trips you have bookmarked for later.</p>
-          </div>
-        )}
+        {activeTab === 'saved' && <SavedDaytrips user={user} />}
         {/* Achievements tab*/}
         {activeTab === 'achievements' && (
           <div>

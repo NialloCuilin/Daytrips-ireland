@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    savedDaytrips: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Daytrip' }],
   },
   { timestamps: true }
 );

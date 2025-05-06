@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+
 
 // @desc    Register a new user
 // @route   POST /api/users/register
@@ -97,9 +99,72 @@ const updateAvatar = async (req, res) => {
   }
 };
 
+const saveDaytrip = async (req, res) => {
+  const userId = req.user.id;
+  const daytripId = req.params.daytripId;
+
+  console.log("Saving daytrip:", daytripId);
+
+  if (!mongoose.Types.ObjectId.isValid(daytripId)) {
+    return res.status(400).json({ message: "Invalid daytrip ID" });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.savedDaytrips.includes(daytripId)) {
+      user.savedDaytrips.push(daytripId);
+      await user.save();
+    }
+
+    res.status(200).json({ message: "Daytrip saved" });
+  } catch (err) {
+    console.error("Error in saveDaytrip:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Unsave a daytrip
+const unsaveDaytrip = async (req, res) => {
+  const userId = req.user._id;
+  const { daytripId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.savedDaytrips = user.savedDaytrips.filter(
+      id => id.toString() !== daytripId
+    );
+    await user.save();
+
+    res.json({ message: 'Daytrip unsaved successfully.' });
+  } catch (err) {
+    console.error('unsaveDaytrip error:', err.message);
+    res.status(500).json({ error: 'Failed to unsave daytrip.' });
+  }
+};
+
+// Get all saved daytrips for a user
+const getSavedDaytrips = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).populate('savedDaytrips');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json(user.savedDaytrips);
+  } catch (err) {
+    console.error('getSavedDaytrips error:', err.message);
+    res.status(500).json({ error: 'Failed to load saved daytrips.' });
+  }
+};
+
 
 module.exports = {
   registerUser,
   loginUser,
   updateAvatar,
+  saveDaytrip,
+  unsaveDaytrip,
+  getSavedDaytrips,
 };
