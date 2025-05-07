@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const asyncHandler = require('express-async-handler');
 
 
 // @desc    Register a new user
@@ -159,6 +160,16 @@ const getSavedDaytrips = async (req, res) => {
   }
 };
 
+const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select('-password'); // exclude password
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
+});
+
 
 module.exports = {
   registerUser,
@@ -167,4 +178,5 @@ module.exports = {
   saveDaytrip,
   unsaveDaytrip,
   getSavedDaytrips,
+  getUserById,
 };

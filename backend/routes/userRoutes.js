@@ -7,7 +7,8 @@ const {
     updateAvatar,
     saveDaytrip,
     unsaveDaytrip,
-    getSavedDaytrips
+    getSavedDaytrips,
+    getUserById,
   } = require('../controllers/userController'); 
 
 const router = express.Router();
@@ -33,5 +34,6 @@ router.delete('/unsave-daytrip/:daytripId', protect, unsaveDaytrip);
 // Get saved daytrips
 router.get('/:userId/saved-daytrips', protect, getSavedDaytrips);
 
+router.get('/:id', getUserById);
 
 module.exports = router;    

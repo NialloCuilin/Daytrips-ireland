@@ -2,18 +2,22 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import DaytripCard from '../DaytripCard';
 
-function SavedDaytrips({ user }) {
+function SavedDaytrips() {
   const [savedTrips, setSavedTrips] = useState([]);
 
   useEffect(() => {
-    if (!user) return;
+    const stored = localStorage.getItem('userInfo');
+    if (!stored) return;
 
-    axios.get(`/api/users/${user._id}/saved-daytrips`, {
-      headers: { Authorization: `Bearer ${user.token}` }
+    const { _id, token } = JSON.parse(stored);
+
+    axios.get(`/api/users/${_id}/saved-daytrips`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => setSavedTrips(res.data))
     .catch(err => console.error("Failed to load saved trips:", err));
-  }, [user]);
+  }, []);
+
 
   return (
     <div>

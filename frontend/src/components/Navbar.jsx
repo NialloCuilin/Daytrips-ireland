@@ -89,12 +89,7 @@ function Navbar() {
 
               {showDropdown && (
                 <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-40 bg-white shadow-lg rounded-md z-50 text-center">
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100 text-gray-700"
-                  >
-                    Profile
-                  </Link>
+                  <Link to={`/profile/${user._id}`}>Profile</Link>
                   <button
                     onClick={handleLogout}
                     className="w-full px-4 py-2 hover:bg-gray-100 text-gray-700"

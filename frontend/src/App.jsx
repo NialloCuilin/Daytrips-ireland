@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom';
 import { LoadScript } from '@react-google-maps/api';
+import { Navigate } from 'react-router-dom';
 import React from 'react';
 import './App.css'
 import Home from './pages/Home';
@@ -15,7 +16,8 @@ import Footer from './components/Footer';
 import CreateDaytrip from './pages/CreateDaytrip';
 import DaytripDetails from './components/DaytripDetails';
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyA3yNr0eqeBW2rjE9LV5kkk7hnJgtVM4Sw'; 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyA3yNr0eqeBW2rjE9LV5kkk7hnJgtVM4Sw';
+const user = JSON.parse(localStorage.getItem('userInfo')); 
 
 function App() {
   return (
@@ -30,7 +32,7 @@ function App() {
             <Route path="/contact" element={<Contact/>}/>
             <Route path="/login" element={<Login />}/>
             <Route path="/signup" element={<Signup />}/>
-            <Route path="/profile" element={<Profile />}/>
+            <Route path="/profile" element={<Navigate to={`/profile/${user?._id}`} />} />
             <Route path="/create-daytrip" element={<CreateDaytrip />} />
             <Route path="/daytrips/:id" element={<DaytripDetails />} />
             <Route path="/profile/:userId" element={<Profile />} />
