@@ -13,6 +13,7 @@ const tagSections = [
   { tags: ['Beach'], title: <> <GiBeachBucket className="inline-block mr-2 text-3xl" /> Seaside Adventures </>},
   { tags: ['Urban'], title: <> <MdLocationCity className="inline-block mr-2 text-3xl"/> Urban Exploration </> },
   { tags: ['Historic'], title: <><FaHourglassHalf className="inline-block mr-2 text-3xl"/> Historical Gems</> },
+  { tags: ['Forests'], title: <> <FaBinoculars className="inline-block mr-2 text-3xl" /> Birdwatcher’s Paradise </> },
   { tags: ['Island'], title: <> <GiIsland className="inline-block mr-2 text-3xl" /> Our Islands</>  },
   { tags: ['Castle'], title: <> <PiCastleTurretFill className="inline-block mr-2 text-3xl" /> Castles & Forts </> },
   { tags: ['Waterfall'], title: <> <FaWater className="inline-block mr-2 text-3xl" /> Don’t Go Chasing... </> },
