@@ -56,7 +56,9 @@ const getUserDaytrips = async (req, res) => {
 // GET /api/daytrips
 const getAllDaytrips = async (req, res) => {
   try {
-    const trips = await Daytrip.find();
+    const trips = await Daytrip.find().then(trips =>
+      trips.map(trip => trip.toJSON({ virtuals: true }))
+    );
     res.json(trips);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch daytrips' });
@@ -76,9 +78,48 @@ const getDaytripById = async (req, res) => {
   }
 };
 
+const rateDaytrip = async (req, res) => {
+  const { value } = req.body;
+  const userId = req.user.id;
+  const { id } = req.params;
+
+  if (!value || value < 1 || value > 5) {
+    return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+  }
+
+  try {
+    const daytrip = await Daytrip.findById(id);
+    if (!daytrip) {
+      return res.status(404).json({ message: 'Daytrip not found' });
+    }
+
+    const existingRating = daytrip.ratings.find(
+      (r) => r.user.toString() === userId
+    );
+
+    if (existingRating) {
+      existingRating.value = value;
+    } else {
+      daytrip.ratings.push({ user: userId, value });
+    }
+
+    await daytrip.save();
+
+    res.status(200).json({
+      message: 'Rating saved',
+      average: daytrip.averageRating,
+      total: daytrip.ratings.length,
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to rate daytrip', error: err.message });
+  }
+};
+
+
 module.exports = { 
   createDaytrip,
   getUserDaytrips,
   getAllDaytrips,
-  getDaytripById, 
+  getDaytripById,
+  rateDaytrip, 
 };

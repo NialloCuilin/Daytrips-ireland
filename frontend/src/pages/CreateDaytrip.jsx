@@ -1,13 +1,8 @@
 import { useState, useRef } from 'react';
 import axios from 'axios';
 import { Autocomplete } from '@react-google-maps/api';
-import { FaMapMarkerAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaMapMarkedAlt,FaMarker, FaTags, FaMapSigns, FaHiking, } from 'react-icons/fa';
 import Select from 'react-select'
-import { FaMapMarkedAlt } from "react-icons/fa";
-import { FaMarker } from "react-icons/fa";
-import { FaTags } from "react-icons/fa";
-import { FaMapSigns } from "react-icons/fa";
-import { FaHiking } from "react-icons/fa";
 import { components } from 'react-select';
 import { useDropzone } from 'react-dropzone';
 import { IoMdStopwatch } from "react-icons/io";
@@ -70,22 +65,16 @@ function CreateDaytrip({ onClose }) {
     {value: 'Glen', label: 'Glen'},{value: 'Island', label: 'Island'},{value: 'Park', label: 'Park'},
     {value: 'Village', label: 'Village'},{value: 'Town', label: 'Town'},{value: 'City', label: 'City'},
     {value: 'Castle', label: 'Castle'},{value: 'Fort', label: 'Fort'},{value: 'Ancient', label: 'Ancient'},
-    {value: 'Bar', label: 'Bar'},{value: 'Reastaurant', label: 'Reastaurant'},{value: 'Cafe', label: 'Cafe'},
-    {value: 'Museum', label: 'Museum'},{value: 'Zoo', label: 'Zoo'},{value: 'Acquarium', label: 'Acquarium'},
+    {value: 'Bar', label: 'Bar'},{value: 'Restaurant', label: 'Restaurant'},{value: 'Cafe', label: 'Cafe'},
+    {value: 'Museum', label: 'Museum'},{value: 'Zoo', label: 'Zoo'},{value: 'Aquarium', label: 'Aquarium'},
     {value: 'Lighthouse', label: 'Lighthouse'},{value: 'Birdwatching', label: 'Birdwatching'},{value: 'Hike', label: 'Hike'},
-    {value: 'Walk', label: 'Walk'},{value: 'Cycle', label: 'Cycle'},{value: 'Sightseeing', label: 'Sightseeing'} ,
-    {value: 'Coffee', label: 'Coffee'},{value: 'Pint', label: 'Pint'},{value: 'Ice-Cream', label: 'Ice-Cream'},
-    {value: 'Breakfast', label: 'Breakfast'},{value: 'Lunch', label: 'Lunch'},{value: 'Dinner', label: 'Dinner'},
-  ];
-  const durationTags = [
-    {value: '1 hour', label: '1 hour'},{value: '2 hours', label: '2 hours'},{value: '3 hours', label: '3 hours'},
-    {value: '4 hours', label: '4 hours'},{value: '5 hours', label: '5 hours'},{value: '6 hours', label: '6 hours'},
-    {value: '7 hours', label: '7 hours'},{value: '8 hours', label: '8 hours'},{value: '9 hours', label: '9 hours'},
-    {value: '10 hours', label: '10 hours'},
+    {value: 'Walk', label: 'Walk'},{value: 'Cycle', label: 'Cycle'},{value: 'Viewpoint', label: 'Viewpoint'} ,
+    {value: 'Ice-Cream', label: 'Ice-Cream'}, {value: 'Historic', label: 'Historic'},{value: 'Landmark', label: 'Landmark'},
+    {value: 'National Park', label: 'National Park'}, {value: 'Urban', label: 'Urban'}
   ];
   const travelTypes = [ 
     {value: 'Car', label: 'Car'},{value: 'Bus', label: 'Bus'},{value: 'Train', label: 'Train'},
-    {value: 'Bike', label: 'Bike'},{value: 'Walk', label: 'Walk'},{value: 'Ferry', label: 'Ferry'}
+    {value: 'Bike', label: 'Bike'},{value: 'Walk', label: 'Walk'},{value: 'Ferry', label: 'Ferry'}  
   ]
   const CountiesPlaceholder = (props) => {
     return (

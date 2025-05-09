@@ -9,6 +9,7 @@ import 'swiper/css/pagination';
 import { FaMapMarkedAlt, FaMapMarkerAlt } from "react-icons/fa";
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { FaClock } from 'react-icons/fa';
+import { FaStar } from 'react-icons/fa';
 import LocationMap from '../components/LocationMap';
 import { Link } from 'react-router-dom';
 
@@ -16,6 +17,7 @@ function DaytripDetails() {
   const { id } = useParams();
   const [daytrip, setDaytrip] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [userRating, setUserRating] = useState(0); // user's personal rating
   const user = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
@@ -23,6 +25,12 @@ function DaytripDetails() {
       try {
         const res = await axios.get(`http://localhost:5000/api/daytrips/${id}`);
         setDaytrip(res.data);
+
+        if (user && res.data.ratings?.length) {
+          const existing = res.data.ratings.find(r => r.user === user._id);
+          if (existing) setUserRating(existing.value);
+        }
+
         if (user) {
           axios
             .get(`/api/users/${user._id}/saved-daytrips`, {
@@ -75,24 +83,52 @@ function DaytripDetails() {
     return `${hours}h ${mins}m`;
   };
 
+  const submitRating = async (value) => {
+    try {
+      setUserRating(value);
+      await axios.post(
+        `http://localhost:5000/api/daytrips/${id}/rate`,
+        { value },
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+    } catch (err) {
+      console.error("Failed to rate trip", err);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       
       {/*Title, Icon, county tag*/}
       <div className="max-w-4xl mx-auto p-0">
         <div className="mb-0 relative">
+          
         
           <div className="flex items-baseline justify-center gap-4">
             <FaMapMarkerAlt className="text-3xl text-red-600" />
-            <h1 className="text-3xl font-bold text-center mb-4">{daytrip.title}</h1>
+            <h1 className="text-3xl font-bold text-left mb-4">{daytrip.title}</h1>
           </div>
-          <div className="absolute right-0 top-3">
+          {user && (
+            <div className="flex items-center justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button key={star} onClick={() => submitRating(star)}>
+                  <FaStar className={`text-2xl ${star <= userRating ? 'text-yellow-400' : 'text-gray-300'}`} />
+                </button>
+              ))}
+              <span className="text-sm text-gray-600">
+                ({daytrip.ratings?.length || 0} rating{daytrip.ratings?.length === 1 ? '' : 's'})
+              </span>
+              <div className="absolute right-0 top-3">
             {daytrip.countyTags?.map((county, i) => (
               <span key={i} className="bg-gray-200 text-black-800 px-3 py-1 rounded-full text-sm">
                 {county}
               </span>
             ))}
           </div>
+            </div>
+          )}
+          
+
         </div>
       </div>
 
@@ -132,6 +168,7 @@ function DaytripDetails() {
       {/* Main Description */}
       <p className="text-gray-800 mb-6 text-left">{daytrip.description}</p>
 
+      
       {/* Locations */}
       <div className="mb-6">
         <div className="flex flex-col items-center mb-6 text-center">
