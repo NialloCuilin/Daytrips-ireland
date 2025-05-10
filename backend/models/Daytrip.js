@@ -32,11 +32,14 @@ const daytripSchema = new mongoose.Schema({
   duration: String,
   travelType: [String], // e.g., ["Car", "Bus", "Bike"]
   ratings: [
-    {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      value: { type: Number, min: 1, max: 5 },
-    },
-  ],
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    value: { type: Number, min: 1, max: 5 },
+    title: { type: String },      
+    comment: {type: String},
+    createdAt: { type: Date, default: Date.now } 
+  }
+  ] 
 });
 
 daytripSchema.virtual('averageRating').get(function () {

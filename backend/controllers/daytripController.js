@@ -68,10 +68,14 @@ const getAllDaytrips = async (req, res) => {
 //GET Daytrip by Id
 const getDaytripById = async (req, res) => {
   try {
-    const daytrip = await Daytrip.findById(req.params.id).populate('author', 'firstName lastName');;
+    const daytrip = await Daytrip.findById(req.params.id)
+      .populate('author', 'firstName lastName')
+      .populate('ratings.user', 'firstName lastName avatar'); // ✅ populate rating users
+
     if (!daytrip) {
       return res.status(404).json({ message: 'Daytrip not found' });
     }
+
     res.json(daytrip);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -79,7 +83,7 @@ const getDaytripById = async (req, res) => {
 };
 
 const rateDaytrip = async (req, res) => {
-  const { value } = req.body;
+  const { value, comment, title } = req.body;
   const userId = req.user.id;
   const { id } = req.params;
 
@@ -99,9 +103,19 @@ const rateDaytrip = async (req, res) => {
 
     if (existingRating) {
       existingRating.value = value;
+      existingRating.comment = comment;
+      existingRating.title = title;
     } else {
-      daytrip.ratings.push({ user: userId, value });
-    }
+      daytrip.ratings.push({
+        user: userId,
+        value,
+        comment,
+        title,
+        createdAt: new Date() // optional, handled by schema default
+      });
+}
+    const sum = daytrip.ratings.reduce((acc, r) => acc + r.value, 0);
+    daytrip.averageRating = sum / daytrip.ratings.length;
 
     await daytrip.save();
 
@@ -115,11 +129,42 @@ const rateDaytrip = async (req, res) => {
   }
 };
 
+// GET /api/reviews/user/:userId
+const getReviewsByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const allDaytrips = await Daytrip.find({ 'ratings.user': userId })
+      .select('title ratings') // select only what's needed
+      .populate('ratings.user', 'firstName lastName avatar');
+
+    const userRatings = [];
+
+    allDaytrips.forEach(daytrip => {
+      daytrip.ratings.forEach(rating => {
+        if (rating.user._id.toString() === userId) {
+          userRatings.push({
+            ...rating.toObject(),
+            daytripTitle: daytrip.title,
+            daytripId: daytrip._id
+          });
+        }
+      });
+    });
+
+    res.json(userRatings);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch reviews', details: err.message });
+  }
+};
+
+
 
 module.exports = { 
   createDaytrip,
   getUserDaytrips,
   getAllDaytrips,
   getDaytripById,
-  rateDaytrip, 
+  rateDaytrip,
+  getReviewsByUser 
 };

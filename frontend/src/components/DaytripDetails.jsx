@@ -6,13 +6,16 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { FaMapMarkedAlt, FaMapMarkerAlt, FaBookmark, FaRegBookmark, FaClock, FaStar, FaShareAlt} from "react-icons/fa";
+import { FaMapMarkedAlt, FaMapMarkerAlt, FaBookmark, FaRegBookmark, FaClock, FaStar, FaStarHalfAlt, FaUserFriends , FaShareAlt} from "react-icons/fa";
 import LocationMap from '../components/LocationMap';
+import RatingModal from "../components/RatingModal";
 
 function DaytripDetails() {
   const { id } = useParams();
   const [daytrip, setDaytrip] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [tempRating, setTempRating] = useState(0);
   const [userRating, setUserRating] = useState(0); // user's personal rating
   const user = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -118,30 +121,42 @@ function DaytripDetails() {
             <FaMapMarkerAlt className="text-3xl text-red-600" />
             <h1 className="text-3xl font-bold text-left mb-4">{daytrip.title}</h1>
           </div>
-          {user && (
-            <div className="flex items-center justify-center gap-2 mb-6">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button key={star} onClick={() => submitRating(star)}>
-                  <FaStar className={`text-2xl ${star <= userRating ? 'text-yellow-400' : 'text-gray-300'}`} />
+          
+          <div className="flex items-center justify-center gap-2 mb-6">
+            {[1, 2, 3, 4, 5].map((star) => {
+              const fullStars = Math.floor(daytrip.averageRating || 0);
+              const hasHalf = daytrip.averageRating - fullStars >= 0.5 && star === fullStars + 1;
+
+              return (
+                <button key={star} onClick={() => {
+                  setTempRating(star);
+                  setShowModal(true);
+                }}>
+                  {star <= fullStars ? (
+                    <FaStar className="text-2xl text-yellow-400" />
+                  ) : hasHalf ? (
+                    <FaStarHalfAlt className="text-2xl text-yellow-400" />
+                  ) : (
+                    <FaStar className="text-2xl text-gray-300" />
+                  )}
                 </button>
-              ))}
-              <span className="text-sm text-gray-600">
+              );
+            })}
+              <span className="text-sm text-gray-600 ml-2">
                 ({daytrip.ratings?.length || 0} rating{daytrip.ratings?.length === 1 ? '' : 's'})
               </span>
-              <div className="absolute right-0 top-3">
-            {daytrip.countyTags?.map((county, i) => (
-              <span key={i} className="bg-gray-200 text-black-800 px-3 py-1 rounded-full text-sm">
-                {county}
-              </span>
-            ))}
           </div>
+
+            {/* County tags */}
+            <div className="absolute right-0 top-3">
+              {daytrip.countyTags?.map((county, i) => (
+                <span key={i} className="bg-gray-200 text-black-800 px-3 py-1 rounded-full text-sm">
+                  {county}
+                </span>
+              ))}
             </div>
-          )}
-          
-
-        </div>
+          </div>
       </div>
-
       {/* Image Swiper */}
       {daytrip.images?.length > 0 && (
         <Swiper
@@ -230,7 +245,6 @@ function DaytripDetails() {
         })}
         </ul>
       </div>
-
       {/* Tags */}
       <div className="flex flex-wrap gap-2 justify-center">
         {daytrip.tags?.map((tag, i) => (
@@ -238,7 +252,88 @@ function DaytripDetails() {
             {tag}
           </span>
         ))}
-      </div> 
+      </div>
+
+      <RatingModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        initialRating={tempRating}
+        user={user}
+        onSubmit={async (rating, comment, title) => {
+          try {
+            await axios.post(
+              `http://localhost:5000/api/daytrips/${id}/rate`,
+              { value: rating, comment, title },
+              { headers: { Authorization: `Bearer ${user.token}` } }
+            );
+            setUserRating(rating);
+            // Optionally re-fetch trip
+          } catch (err) { 
+            console.error("Rating failed:", err);
+          }
+        }}  
+      /> 
+
+      <div className="space-y-6 mt-10">
+        {/*User reviews title*/}
+        <h2 className="text-3xl font-bold text-left flex items-center gap-2">
+          <FaUserFriends className="text-black text-3xl" />
+          User Reviews
+        </h2>
+
+        {daytrip.ratings?.map((rating, idx) => (
+          <div key={idx} className="border rounded-lg p-6 shadow-sm flex gap-6 items-start bg-yellow-50">
+            
+            {/* Left: Avatar & Name */}
+            <div className="flex flex-col items-center w-28 text-center">
+              <div className="w-16 h-16 rounded-full bg-green-200 text-green-800 font-bold text-xl flex items-center justify-center">
+                {rating.user?.avatar ? (
+                  <img
+                    src={rating.user.avatar}
+                    alt="User avatar"
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-green-200 text-green-800 font-bold text-xl flex items-center justify-center">
+                    {rating.user?.firstName?.[0] || '?'}
+                  </div>
+                )}
+              </div>
+              <Link 
+                to={`/profile/${rating.user?._id}`} 
+                className="mt-2 text-sm text-gray-800 font-medium mb-2 hover:underline"
+              >
+                {rating.user?.firstName} {rating.user?.lastName}
+              </Link>
+              <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <FaStar
+                      key={s}
+                      className={`text-lg ${s <= rating.value ? 'text-yellow-400' : 'text-gray-300'}`}
+                    />
+                  ))}
+                </div>
+            </div>
+
+            {/* Right: Rating Info */}
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <h3 className="font-bold text-lg">{rating.title}</h3>
+                  <p className="text-sm text-gray-500 italic whitespace-nowrap">
+                    {new Date(rating.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Comment Box */} 
+                {rating.comment && (
+                  <div className="mt-3 p-3 border border-gray-200 rounded bg-gray-50 text-sm text-gray-700 text-left">
+                    {rating.comment}
+                  </div>
+                )}
+              </div>
+          </div>
+        ))}
+      </div>
       {/* Save & share buttons */}
       <div className="flex justify-end gap-4 mt-6 w-full">
         <button

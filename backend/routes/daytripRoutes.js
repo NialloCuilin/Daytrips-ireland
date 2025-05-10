@@ -1,17 +1,23 @@
 const express = require('express');
-const { createDaytrip } = require('../controllers/daytripController');
-const { getUserDaytrips } = require('../controllers/daytripController');
-const { getAllDaytrips, getDaytripById } = require('../controllers/daytripController');
-const { rateDaytrip } = require('../controllers/daytripController');
+const { 
+  createDaytrip, 
+  getUserDaytrips, 
+  getAllDaytrips, 
+  getDaytripById, 
+  rateDaytrip, 
+  getReviewsByUser // ✅ ADD THIS
+} = require('../controllers/daytripController');
 const { protect } = require('../middleware/authMiddleware');    
 const router = express.Router();
 
-//post
+// POST
 router.post('/create', createDaytrip);
 router.post('/:id/rate', protect, rateDaytrip);
-//get
-router.get('/user/:userId', getUserDaytrips);     //For "My Daytrips"
-router.get('/:id', getDaytripById); //For "Daytrip details"
-router.get('/', getAllDaytrips); //For "All Daytrips"
+
+// GET
+router.get('/user/:userId', getUserDaytrips);
+router.get('/reviews/user/:userId', getReviewsByUser); // ✅ ADD THIS
+router.get('/:id', getDaytripById);
+router.get('/', getAllDaytrips);
 
 module.exports = router;

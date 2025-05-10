@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaUserFriends, FaBookmark, FaMapMarkedAlt, FaMedal, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaUserFriends, FaBookmark, FaMapMarkedAlt, FaMedal, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 import CreateDaytrip from './CreateDaytrip';
 import MyDaytrips from '../components/profile/MyDaytrips';
 import SavedDaytrips from '../components/profile/SavedDaytrips';
+import UserReviews from '../components/profile/UserReviews';
 import axios from 'axios';
 
 const getRandomColor = () => {
@@ -120,6 +121,9 @@ function Profile() {
         <button onClick={() => setActiveTab('daytrips')} className={`flex items-center space-x-2 px-4 py-2 rounded-full ${activeTab === 'daytrips' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
           <FaMapMarkedAlt /><span>My Daytrips</span>
         </button>
+        <button onClick={() => setActiveTab('reviews')} className={`flex items-center space-x-2 px-4 py-2 rounded-full ${activeTab === 'reviews' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
+            <FaStar /><span>Reviews</span>
+          </button>
         <button onClick={() => setActiveTab('saved')} className={`flex items-center space-x-2 px-4 py-2 rounded-full ${activeTab === 'saved' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
           <FaBookmark /><span>Saved Trips</span>
         </button>
@@ -133,6 +137,7 @@ function Profile() {
 
       <div className="bg-white rounded-lg shadow p-6">
         {activeTab === 'daytrips' && <MyDaytrips userId={user._id} onCreate={() => setShowForm(true)} />}
+        {activeTab === 'reviews' && <UserReviews userId={user._id} />}
         {activeTab === 'saved' && <SavedDaytrips user={user} />}
         {activeTab === 'achievements' && <p>Your badges and milestones will show here!</p>}
         {activeTab === 'friends' && <p>Connect with other explorers here!</p>}
