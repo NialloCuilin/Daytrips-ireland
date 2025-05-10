@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { FaMapMarkedAlt, FaMapMarkerAlt } from "react-icons/fa";
-import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
-import { FaClock } from 'react-icons/fa';
-import { FaStar } from 'react-icons/fa';
+import { FaMapMarkedAlt, FaMapMarkerAlt, FaBookmark, FaRegBookmark, FaClock, FaStar, FaShareAlt} from "react-icons/fa";
 import LocationMap from '../components/LocationMap';
-import { Link } from 'react-router-dom';
 
 function DaytripDetails() {
   const { id } = useParams();
@@ -71,6 +67,22 @@ function DaytripDetails() {
     }
   };
 
+  const handleShare = () => {
+    const shareData = {
+      title: daytrip.title,
+      text: `Check out this daytrip: ${daytrip.title}`,
+      url: window.location.href,
+    };
+  
+    if (navigator.share) {
+      navigator.share(shareData).catch((err) => console.error('Sharing failed:', err));
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+        .then(() => alert('Link copied to clipboard!'))
+        .catch(() => alert('Could not copy link.'));
+    }
+  };
+
   const formatDuration = (durationString) => {
     const minutes = parseInt(durationString);
     if (isNaN(minutes)) return durationString;
@@ -98,12 +110,10 @@ function DaytripDetails() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      
+  
       {/*Title, Icon, county tag*/}
       <div className="max-w-4xl mx-auto p-0">
         <div className="mb-0 relative">
-          
-        
           <div className="flex items-baseline justify-center gap-4">
             <FaMapMarkerAlt className="text-3xl text-red-600" />
             <h1 className="text-3xl font-bold text-left mb-4">{daytrip.title}</h1>
@@ -167,7 +177,6 @@ function DaytripDetails() {
 
       {/* Main Description */}
       <p className="text-gray-800 mb-6 text-left">{daytrip.description}</p>
-
       
       {/* Locations */}
       <div className="mb-6">
@@ -222,8 +231,6 @@ function DaytripDetails() {
         </ul>
       </div>
 
-    
-
       {/* Tags */}
       <div className="flex flex-wrap gap-2 justify-center">
         {daytrip.tags?.map((tag, i) => (
@@ -232,15 +239,25 @@ function DaytripDetails() {
           </span>
         ))}
       </div> 
-      {/* Save button */}
-       <button
-        onClick={toggleSave}
-        className="flex items-center gap-2 mb-4 mt-6 text-gray-600 hover:text-black border px-4 py-2 rounded shadow"
-        title={isSaved ? "Unsave this daytrip" : "Save this daytrip"}
-      >
-        {isSaved ? <FaBookmark /> : <FaRegBookmark />}
-        {isSaved ? "Saved" : "Save this daytrip"}
-      </button>
+      {/* Save & share buttons */}
+      <div className="flex justify-end gap-4 mt-6 w-full">
+        <button
+          onClick={toggleSave}
+          className="flex items-center gap-2 text-gray-600 hover:text-black border px-4 py-2 rounded shadow"
+          title={isSaved ? "Unsave this daytrip" : "Save this daytrip"}
+        >
+          {isSaved ? <FaBookmark /> : <FaRegBookmark />}
+          {isSaved ? "Saved" : "Save this daytrip"}
+        </button>
+
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 border px-4 py-2 rounded shadow"
+          title="Share this daytrip"
+        >
+          <FaShareAlt/> Share
+        </button>
+      </div>
     </div>
   );
 }

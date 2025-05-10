@@ -7,6 +7,8 @@ import { components } from 'react-select';
 import { useDropzone } from 'react-dropzone';
 import { IoMdStopwatch } from "react-icons/io";
 import { Loader } from "@googlemaps/js-api-loader";
+import { generalTags } from '../utils/tags';
+import {countyTags} from '../utils/counties';
 
 function CreateDaytrip({ onClose }) {
   const [form, setForm] = useState({
@@ -45,33 +47,7 @@ function CreateDaytrip({ onClose }) {
   const [locationInputs, setLocationInputs] = useState([
     { id: Date.now(), ref: null, description: '', timeSpent: '30' } // default to 30 mins
   ]);
-  const countyTags = [ 
-    {value: 'Antrim', label: 'Antrim'},{value: 'Armagh', label: 'Armagh'},{value: 'Carlow', label: 'Carlow'},
-    {value: 'Cavan', label: 'Cavan'},{value: 'Clare', label: 'Clare'},{value: 'Cork', label: 'Cork'},
-    {value: 'Derry', label: 'Derry'},{value: 'Donegal', label: 'Donegal'},{value: 'Down', label: 'Down'},
-    {value: 'Dublin', label: 'Dublin'},{value: 'Fermanagh', label: 'Fermanagh'}, {value: 'Galway', label: 'Galway'}, 
-    {value: 'Kerry', label: 'Kerry'}, {value: 'Kildare', label: 'Kildare'}, {value: 'Kilkenny', label: 'Kilkenny'},
-    {value: 'Laois', label: 'Laois'},{value: 'Leitrim', label: 'Leitrim'},{value: 'Limerick', label: 'Limerick'},
-    {value: 'Longford', label: 'Longford'},{value: 'Louth', label: 'Louth'},{value: 'Mayo', label: 'Mayo'},
-    {value: 'Meath', label: 'Meath'},{value: 'Monaghan', label: 'Monaghan'},{value: 'Offaly', label: 'Offaly'},
-    {value: 'Roscommon', label: 'Roscommon'},{value: 'Sligo', label: 'Sligo'},{value: 'Tipperary', label: 'Tipperary'},
-    {value: 'Tyrone', label: 'Tyrone'},{value: 'Waterford', label: 'Waterford'},{value: 'Westmeath', label: 'Westmeath'},
-    {value: 'Wexford', label: 'Wexford'},{value: 'Wicklow', label: 'Wicklow'},
-  ];
-  const generalTags =[
-    {value: 'Beach', label: 'Beach'},{value: 'Forest', label: 'Forest'},{value: 'River', label: 'River'},
-    {value: 'Mountain', label: 'Mountain'},{value: 'Bog', label: 'Bog'},{value: 'Lough', label: 'Lough'},
-    {value: 'Cave', label: 'Cave'},{value: 'Cliffs', label: 'Cliffs'},{value: 'Waterfall', label: 'Waterfall'},
-    {value: 'Glen', label: 'Glen'},{value: 'Island', label: 'Island'},{value: 'Park', label: 'Park'},
-    {value: 'Village', label: 'Village'},{value: 'Town', label: 'Town'},{value: 'City', label: 'City'},
-    {value: 'Castle', label: 'Castle'},{value: 'Fort', label: 'Fort'},{value: 'Ancient', label: 'Ancient'},
-    {value: 'Bar', label: 'Bar'},{value: 'Restaurant', label: 'Restaurant'},{value: 'Cafe', label: 'Cafe'},
-    {value: 'Museum', label: 'Museum'},{value: 'Zoo', label: 'Zoo'},{value: 'Aquarium', label: 'Aquarium'},
-    {value: 'Lighthouse', label: 'Lighthouse'},{value: 'Birdwatching', label: 'Birdwatching'},{value: 'Hike', label: 'Hike'},
-    {value: 'Walk', label: 'Walk'},{value: 'Cycle', label: 'Cycle'},{value: 'Viewpoint', label: 'Viewpoint'} ,
-    {value: 'Ice-Cream', label: 'Ice-Cream'}, {value: 'Historic', label: 'Historic'},{value: 'Landmark', label: 'Landmark'},
-    {value: 'National Park', label: 'National Park'}, {value: 'Urban', label: 'Urban'}
-  ];
+  
   const travelTypes = [ 
     {value: 'Car', label: 'Car'},{value: 'Bus', label: 'Bus'},{value: 'Train', label: 'Train'},
     {value: 'Bike', label: 'Bike'},{value: 'Walk', label: 'Walk'},{value: 'Ferry', label: 'Ferry'}  
