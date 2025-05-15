@@ -22,7 +22,6 @@ function RatingModal({ isOpen, onClose, onSubmit, user, initialRating = 0 }) {
       )}
         <h2 className="text-xl font-bold mb-1 italic">What did you think?</h2>
         <p className="text-sm mb-3 italic">Rate this Daytrip</p>
-
         {/* Stars */}
         <div className="flex gap-1 mb-4 justify-center">
           {[1, 2, 3, 4, 5].map((star) => (

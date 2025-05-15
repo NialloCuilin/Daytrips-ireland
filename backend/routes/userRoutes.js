@@ -37,8 +37,8 @@ router.delete('/unsave-daytrip/:daytripId', protect, unsaveDaytrip);
 router.get('/:userId/saved-daytrips', protect, getSavedDaytrips);
 
 router.get('/:id', getUserById);
-
-router.get('/reviews/user/:userId', getUserReviews); // ✅ ADD THIS LINE
+// get reviews for a user
+router.get('/reviews/user/:userId', getUserReviews); 
 
 // Follow a user
 router.post('/:id/follow', protect, followUser);

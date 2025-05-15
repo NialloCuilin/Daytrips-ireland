@@ -5,7 +5,7 @@ const mapContainerStyle = {
   height: '400px',
   width: '100%',
 };
-
+//map locations to be displayed
 const LocationMap = ({ locations }) => {
   const mapRef = useRef(null);
 

@@ -1,25 +1,23 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { FaEnvelope, FaLock } from 'react-icons/fa';
 import scenicImage from '../assets/Images/giants_causeway.jpg';
 import logo from '../assets/Images/logo.png';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    // Final check before submission
+    // Validate email format
     if (!email || !password) {
       toast.warn('Please fill in all fields.');
       return;
     }
-    if (emailError || passwordError) {
+    if (emailError) {
       toast.error('Please fix the errors before logging in.');
       return;
     }
@@ -44,7 +42,7 @@ function Login() {
 
   return (
     <div className="flex h-screen w-full">
-      {/* Left half - Image */}
+      {/* Left half */}
       <div className="w-2/3 h-full">
         <img
           src={scenicImage}
@@ -52,12 +50,11 @@ function Login() {
           className="w-full h-full object-cover"
         />
       </div>
-
-      {/* Right half - Full-height Login Form */}
+      {/* Right half*/}
       <div className="w-1/3 h-full flex flex-col justify-start mt-24 px-16 bg-white">
         <h2 className="text-4xl font-bold text-green-700 mb-8">Login</h2>
         <form onSubmit={handleLogin} className="space-y-6">
-         {/* Email Field with Icon */}
+         {/* Email Field */}
           <div className="relative">
             <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
@@ -72,8 +69,7 @@ function Login() {
             />
             {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
           </div>
-
-          {/* Password Field with Icon */}
+          {/* Password Field */}
           <div className="relative">
             <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
@@ -84,8 +80,6 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-
-
           {/* Submit Button */}
           <button
             type="submit"
@@ -98,7 +92,6 @@ function Login() {
           >
             Log In
           </button>
-
           {/* Register Link */}
           <div className="text-sm">
             Don’t have an account?{' '}
@@ -106,7 +99,6 @@ function Login() {
               Register
             </a>
           </div>
-
           {/* Logo */}
           <div className="mb-4">
             <img

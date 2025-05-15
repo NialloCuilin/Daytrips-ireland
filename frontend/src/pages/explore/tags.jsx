@@ -22,7 +22,7 @@ function TagsFilter() {
   );
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 max-w-6xl mx-auto ">
       <h1 className="text-3xl font-bold mb-6">Filter by Tags</h1>
       <div className="flex flex-wrap gap-2 mb-6">
         {generalTags.map(tag => (

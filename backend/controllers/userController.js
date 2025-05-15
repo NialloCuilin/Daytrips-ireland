@@ -118,7 +118,7 @@ const saveDaytrip = async (req, res) => {
       user.savedDaytrips.push(daytripId);
       await user.save();
 
-      // ✅ Create activity for "save"
+      //Create activity for save
       await Activity.create({
         type: 'save',
         actor: userId,
@@ -171,7 +171,7 @@ const getUserById = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id)
   .select('-password')
   .populate('followers', 'firstName lastName avatar')
-  .populate('following', 'firstName lastName avatar');// exclude password
+  .populate('following', 'firstName lastName avatar');
   if (user) {
     res.json(user);
   } else {
@@ -201,7 +201,7 @@ const followUser = async (req, res) => {
     await user.save();
     await target.save();
 
-    // ✅ Log follow activity only
+    //Log follow activity only
     await Activity.create({
       type: 'follow',
       actor: userId,
@@ -224,7 +224,6 @@ const unfollowUser = async (req, res) => {
 
   res.status(200).json({ message: "Unfollowed successfully." });
 };
-
 
 module.exports = {
   registerUser,

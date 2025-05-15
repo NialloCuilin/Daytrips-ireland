@@ -36,8 +36,6 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     savedDaytrips: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Daytrip' }],
-
-    // ✅ Add these fields for the social system
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
@@ -47,4 +45,3 @@ const userSchema = new mongoose.Schema(
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
-// module.exports = {

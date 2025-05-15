@@ -1,6 +1,7 @@
 const Daytrip = require('../models/Daytrip');
 const Activity = require('../models/Activity');
-const mongoose = require('mongoose');
+const mongoose = require('mongoose'); 
+const asyncHandler = require('express-async-handler');
 
 const createDaytrip = async (req, res) => {
   try {
@@ -31,7 +32,7 @@ const createDaytrip = async (req, res) => {
     await daytrip.save();
     await Activity.create({
       type: 'create',
-      actor: author, // assuming `author` is the user ID
+      actor: author,
       daytrip: daytrip._id
     });
     res.status(201).json(daytrip);
@@ -39,18 +40,15 @@ const createDaytrip = async (req, res) => {
     res.status(500).json({ message: 'Failed to create daytrip', error: err.message });
   }
 };
-
 // GET /api/daytrips/user/:userId
 const getUserDaytrips = async (req, res) => {
   try {
     const userId = req.params.userId;
-
-    // ✅ Validate ObjectId
+    // Validate userId format
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: 'Invalid user ID format' });
     }
-
-    // ✅ Query with string instead of forcing ObjectId instance
+    //Query with string instead of forcing ObjectId instance
     const daytrips = await Daytrip.find({ author: userId });
 
     res.json(daytrips);
@@ -76,7 +74,7 @@ const getDaytripById = async (req, res) => {
   try {
     const daytrip = await Daytrip.findById(req.params.id)
       .populate('author', 'firstName lastName')
-      .populate('ratings.user', 'firstName lastName avatar'); // ✅ populate rating users
+      .populate('ratings.user', 'firstName lastName avatar');
 
     if (!daytrip) {
       return res.status(404).json({ message: 'Daytrip not found' });
@@ -122,7 +120,7 @@ const rateDaytrip = async (req, res) => {
       });
     }
 
-    // ✅ Always log the rating activity (whether new or updated)
+    //log the rating activity 
     await Activity.create({
       type: 'rate',
       actor: userId,
@@ -145,7 +143,6 @@ const rateDaytrip = async (req, res) => {
   }
 };
 
-
 // GET /api/reviews/user/:userId
 const getUserReviews = async (req, res) => {
   try {
@@ -154,11 +151,10 @@ const getUserReviews = async (req, res) => {
     const reviews = await Daytrip.find({
       ratings: { $elemMatch: { user: userId } }
     })
-      .populate('author', 'firstName lastName avatar')         // trip creator
-      .populate('ratings.user', 'firstName lastName avatar')   // reviewer info
+      .populate('author', 'firstName lastName avatar')        
+      .populate('ratings.user', 'firstName lastName avatar')  
       .lean();
-
-    // ✅ Safely compare populated user._id to userId string
+      
     const userReviews = reviews.flatMap(daytrip => {
       return daytrip.ratings
         .filter(r => r.user?._id?.toString() === userId)
@@ -179,11 +175,59 @@ const getUserReviews = async (req, res) => {
   }
 };
 
+const deleteDaytrip = asyncHandler(async (req, res) => {
+  const trip = await Daytrip.findById(req.params.id);
+
+  if (!trip) {
+    res.status(404);
+    throw new Error('Daytrip not found');
+  }
+
+  if (trip.author.toString() !== req.user._id.toString()) {
+    res.status(401);
+    throw new Error('Not authorized to delete this daytrip');
+  }
+
+  await trip.deleteOne();
+  res.json({ message: 'Daytrip deleted' });
+});
+
+//delete review
+const deleteReview = asyncHandler(async (req, res) => {
+  const { userId, reviewId } = req.params;
+
+  const daytrip = await Daytrip.findOne({ "ratings._id": reviewId });
+
+  if (!daytrip) {
+    res.status(404);
+    throw new Error("Review not found");
+  }
+
+  const review = daytrip.ratings.id(reviewId);
+
+  if (!review) {
+    res.status(404);
+    throw new Error("Review not found");
+  }
+
+  if (review.user.toString() !== userId && req.user._id.toString() !== userId) {
+    res.status(401);
+    throw new Error("Not authorized to delete this review");
+  }
+
+  review.remove();
+  await daytrip.save();
+
+  res.json({ message: "Review deleted successfully" });
+});
+
 module.exports = { 
-  createDaytrip,
+  createDaytrip,  
   getUserDaytrips,
   getAllDaytrips,
   getDaytripById,
   rateDaytrip,
-  getUserReviews
+  getUserReviews,
+  deleteDaytrip,
+  deleteReview
 };

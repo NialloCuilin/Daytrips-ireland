@@ -13,7 +13,7 @@
     },
     targetUser: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User' // e.g., followed someone
+      ref: 'User'
     },
     daytrip: {
       type: mongoose.Schema.Types.ObjectId,

@@ -5,9 +5,11 @@ import DaytripCard from '../../components/DaytripCard';
 function LocationFilter() {
   const [daytrips, setDaytrips] = useState([]);
   const [filtered, setFiltered] = useState([]);
-  const [distance, setDistance] = useState(30);
+  const [maxTravelTime, setMaxTravelTime] = useState(480); 
   const [duration, setDuration] = useState(480);
   const [location, setLocation] = useState(null);
+
+  const AVERAGE_SPEED_KMH = 45; // Estimate: driving speed
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/daytrips').then(res => setDaytrips(res.data));
@@ -25,19 +27,33 @@ function LocationFilter() {
       const R = 6371;
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     };
 
-    const result = daytrips.filter(trip => {
-      const tripDuration = parseInt(trip.duration) || 0;
-      return (
-        trip.locations?.some(loc => haversine(location.lat, location.lng, loc.lat, loc.lng) <= distance) &&
-        tripDuration <= duration
-      );
-    });
+    const result = daytrips
+      .map(trip => {
+        const tripDuration = parseInt(trip.duration) || 0;
+        const tripDistances = trip.locations?.map(loc =>
+          haversine(location.lat, location.lng, loc.lat, loc.lng)
+        ) || [];
+
+        const minDistance = Math.min(...tripDistances);
+        const estimatedTime = Math.round((minDistance / AVERAGE_SPEED_KMH) * 60);
+
+        return {
+          ...trip,
+          travelTime: estimatedTime,
+          isWithinFilters: estimatedTime <= maxTravelTime && tripDuration <= duration
+        };
+      })
+      .filter(trip => trip.isWithinFilters)
+      .sort((a, b) => a.travelTime - b.travelTime); // sort by shortest time
+
     setFiltered(result);
-  }, [daytrips, location, distance, duration]);
+  }, [daytrips, location, maxTravelTime, duration]);
 
   const formatDuration = (minutes) => {
     const hrs = Math.floor(minutes / 60);
@@ -51,26 +67,27 @@ function LocationFilter() {
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Daytrips Near You</h1>
 
+      {/* Filters */}
       <div className="mb-6 grid gap-6 md:grid-cols-2">
         <div>
-          <label htmlFor="distance" className="block mb-1 font-semibold">
-            Max Distance: <span className="text-blue-600">{distance} km</span>
+          <label htmlFor="travelTime" className="block mb-1 font-semibold">
+            Max Travel Time: <span className="text-blue-600">{formatDuration(maxTravelTime)}</span>
           </label>
           <input
             type="range"
-            id="distance"
-            min={5}
-            max={100}
-            step={5}
-            value={distance}
-            onChange={e => setDistance(Number(e.target.value))}
+            id="travelTime"
+            min={15}
+            max={480}
+            step={15}
+            value={maxTravelTime}
+            onChange={e => setMaxTravelTime(Number(e.target.value))}
             className="w-full accent-green-500"
           />
         </div>
 
         <div>
           <label htmlFor="duration" className="block mb-1 font-semibold">
-            Max Duration: <span className="text-blue-600">{formatDuration(duration)}</span>
+            Max Activity Duration: <span className="text-blue-600">{formatDuration(duration)}</span>
           </label>
           <input
             type="range"
@@ -85,8 +102,15 @@ function LocationFilter() {
         </div>
       </div>
 
+      {/* Filtered Daytrips */}
       <div className="grid md:grid-cols-3 gap-4">
-        {filtered.map(trip => <DaytripCard key={trip._id} daytrip={trip} />)}
+        {filtered.length === 0 ? (
+          <p>No daytrips found within the selected filters.</p>
+        ) : (
+          filtered.map(trip => (
+            <DaytripCard key={trip._id} daytrip={trip} />
+          ))
+        )}
       </div>
     </div>
   );

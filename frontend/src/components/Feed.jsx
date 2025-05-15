@@ -29,7 +29,6 @@
     }, []);
 
     if (loading) return <p className="text-gray-500 italic p-4">Loading your feed...</p>;
-
     if (feed.length === 0) {
       return <p className="text-gray-500 italic p-4">No recent activity from people you follow.</p>;
     }
@@ -39,7 +38,6 @@
         <h2 className=" flex justify-center text-3xl font-bold text-green-500 mb-4"> <FaRegNewspaper className="text-4xl mr-4"/>Activity</h2>
         {feed.map((item, i) => (  
           <div key={i} className="bg-gray-50 p-6 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200">
-      
             {/* Avatar centered */}
             <div className="flex justify-center">
                 {item.type === 'follow' && (
@@ -58,15 +56,12 @@
                   </div>  
                 )}
             </div>
-
             {/* Activity type & date */}
-          
             <div className="relative flex items-center gap-1 text-sm text-gray-500 justify-end mb-4">
               <FaClock />
               <span>{formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}</span>
             </div>
 
-                
             {/* Activity description */}
             <p className="text-gray-800">
               <Link
@@ -75,7 +70,7 @@
               >
                 {item.actor?.firstName} {item.actor?.lastName}
               </Link> {' '}
-              
+                {/*Create post*/}
                 {item.type === 'create' && (
                   <>
                     created a new daytrip "
@@ -97,6 +92,7 @@
                     )}
                   </>
                 )}
+                {/*Rate post*/}
                 {item.type === 'rate' && (
                   <>
                     rated{' '}
@@ -120,6 +116,7 @@
                     )}
                   </>
                 )}
+                {/*Save Post*/}
                 {item.type === 'save' && (
                   <>
                     added{' '}
@@ -141,6 +138,7 @@
                     )}
                   </>
                 )}
+               {/*Follow Post*/}
                 {item.type === 'follow' && (
                   <>
                     followed{' '}
@@ -155,7 +153,6 @@
               </p>
             </div>
           ))}
-
       </div>
     );
   }

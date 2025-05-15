@@ -5,7 +5,6 @@ import { FaMapMarkerAlt, FaMapMarkedAlt,FaMarker, FaTags, FaMapSigns, FaHiking, 
 import Select from 'react-select'
 import { components } from 'react-select';
 import { useDropzone } from 'react-dropzone';
-import { IoMdStopwatch } from "react-icons/io";
 import { Loader } from "@googlemaps/js-api-loader";
 import { generalTags } from '../utils/tags';
 import {countyTags} from '../utils/counties';
@@ -72,16 +71,8 @@ function CreateDaytrip({ onClose }) {
       </components.Placeholder>
     );
   };
-  const durationPlaceholder = (props) => {
-    return (
-      <components.Placeholder {...props}>
-        <span className="flex items-center gap-2 text-gray-500">
-        <IoMdStopwatch />
-          {props.children}
-        </span>
-      </components.Placeholder>
-    );
-  };
+
+  // styles for the tags
   const countyStyles = {
     multiValue: (styles) => ({
       ...styles,
@@ -141,12 +132,9 @@ function CreateDaytrip({ onClose }) {
   
     await loader.load();
     const { google } = window;
-  
     const coords = selectedPlaces.map(p => new google.maps.LatLng(p.lat, p.lng));
     const totalVisitMinutes = locationInputs.reduce((sum, l) => sum + Number(l.timeSpent || 0), 0);
 
-
-  
     if (coords.length < 2) {
       return totalVisitMinutes;
     }
@@ -163,13 +151,13 @@ function CreateDaytrip({ onClose }) {
             {
               origins: [coords[i]],
               destinations: [coords[i + 1]],
-              travelMode: google.maps.TravelMode.DRIVING, // Or WALKING, etc.
+              travelMode: google.maps.TravelMode.DRIVING, 
             },
             (response, status) => {
               if (status !== "OK") return rej(status);
               const element = response.rows[0].elements[0];
               if (element.status === "OK") {
-                res(element.duration.value); // in seconds
+                res(element.duration.value); 
               } else {
                 res(0);
               }
@@ -185,7 +173,6 @@ function CreateDaytrip({ onClose }) {
       }).catch(reject);
     });
   };
-  
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -204,7 +191,7 @@ function CreateDaytrip({ onClose }) {
       return updated;
     });
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem('userInfo'));
@@ -256,7 +243,7 @@ function CreateDaytrip({ onClose }) {
   const addLocationInput = () => {
     setLocationInputs([
       ...locationInputs,
-      { id: Date.now(), ref: null, description: '', timeSpent: '30' } // ✅ DEFAULT HERE
+      { id: Date.now(), ref: null, description: '', timeSpent: '30' }
     ]);
   };
   return (
@@ -317,7 +304,6 @@ function CreateDaytrip({ onClose }) {
                     className="w-full pl-10 pr-8 p-2 border rounded"
                   />
                 </Autocomplete>
-
                 {locationInputs.length > 1 && (
                   <button
                     type="button"
@@ -329,9 +315,8 @@ function CreateDaytrip({ onClose }) {
                   </button>
                 )}
               </div>
-              
             </div>
-
+            {/* Duration of stay input */}
             <div className="flex items-center gap-3">
               <label className="text-3x-l text-gray-600 whitespace-nowrap">
                 Duration of Stay at Location (minutes):
@@ -344,7 +329,7 @@ function CreateDaytrip({ onClose }) {
                 className="flex-1 p-2 border rounded"
               />
             </div>
-
+            {/* Description */}
             <div>
               <textarea
                 placeholder="Description for this location... Any advice or tips?"
@@ -355,7 +340,6 @@ function CreateDaytrip({ onClose }) {
             </div>
           </div>
         ))}
-
         {/* Button to add more location inputs */}
         <button
           type="button"
@@ -436,8 +420,8 @@ function CreateDaytrip({ onClose }) {
             onChange={setSelectedTravelType}
             placeholder="Travel Type..."
           />
-          
         </div>
+        {/* Submit */}
         <button type="submit" className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
           Submit Daytrip
         </button>

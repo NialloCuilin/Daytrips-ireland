@@ -5,19 +5,25 @@ const {
   getAllDaytrips, 
   getDaytripById, 
   rateDaytrip, 
-  getUserReviews // ✅ ADD THIS
+  getUserReviews,
+  deleteDaytrip,
+  deleteReview
 } = require('../controllers/daytripController');
 const { protect } = require('../middleware/authMiddleware');    
 const router = express.Router();
 
 // POST
-router.post('/create', createDaytrip);
+router.post('/create', protect, createDaytrip);
 router.post('/:id/rate', protect, rateDaytrip);
 
 // GET
 router.get('/user/:userId', getUserDaytrips);
-router.get('/reviews/user/:userId', getUserReviews); // ✅ ADD THIS
+router.get('/reviews/user/:userId', getUserReviews); 
 router.get('/:id', getDaytripById);
 router.get('/', getAllDaytrips);
+
+// DELETE
+router.delete('/:id', protect, deleteDaytrip);
+router.delete('/reviews/:userId/:reviewId', protect, deleteReview);
 
 module.exports = router;

@@ -18,17 +18,18 @@ function Signup() {
 
   const [errors, setErrors] = useState({});
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+  {/*Form Validation */}
   const validate = () => {
     const newErrors = {};
-
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required.';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required.';
     if (!emailRegex.test(formData.email)) newErrors.email = 'Invalid email format.';
     if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters.';
+    if (!/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/.test(formData.password)) {
+      newErrors.password = 'Password must include a number, uppercase letter, and special character.';
+    }
     if (formData.confirmPassword !== formData.password) newErrors.confirmPassword = 'Passwords do not match.';
     if (!formData.county) newErrors.county = 'Please select a county.';
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -57,13 +58,11 @@ function Signup() {
 
   return (
     <div className="flex h-screen w-full">
-      
       {/* Left Half - Form */}
       <div className="w-full md:w-1/3  flex flex-col justify-start px-8 md:px-16 pt-16 bg-white overflow-y-auto">
         <div className="max-w-lg mx-auto w-full">
           <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">Register</h2>
           <form onSubmit={handleSignup} className="space-y-5">
-
             {/* Input Fields */}
             {[
               { name: 'firstName', icon: <FaUser />, placeholder: 'First Name' },
@@ -89,7 +88,6 @@ function Signup() {
                 {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
               </div>
             ))}
-
             {/* County Dropdown */}
             <div className="flex flex-col space-y-1">
               <select
@@ -109,7 +107,6 @@ function Signup() {
               </select>
               {errors.county && <p className="text-red-500 text-sm">{errors.county}</p>}
             </div>
-
             {/* Submit */}
             <button
               type="submit"
@@ -120,7 +117,6 @@ function Signup() {
           </form>
         </div>
       </div>
-
       {/* Right Half - Image */}
       <div className="hidden md:block w-2/3 h-full">
         <img

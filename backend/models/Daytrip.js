@@ -6,7 +6,7 @@ const ratingSchema = new mongoose.Schema({
   title: { type: String },
   comment: { type: String }
 }, {
-  timestamps: true  // ✅ This enables createdAt & updatedAt for each review
+  timestamps: true 
 });
 
 const daytripSchema = new mongoose.Schema({
@@ -35,11 +35,11 @@ const daytripSchema = new mongoose.Schema({
     description: String,
     timeSpent: Number,
   }],
-  images: [String], // array of Cloudinary URLs
-  countyTags: [String], // e.g., ["County Derry", "County Antrim"]  
-  tags: [String], // e.g., ["Hike", "Waterfall", "Birdwatching"]
+  images: [String], 
+  countyTags: [String], 
+  tags: [String], 
   duration: String,
-  travelType: [String], // e.g., ["Car", "Bus", "Bike"]
+  travelType: [String], 
   ratings: [ratingSchema] 
 });
 
@@ -48,7 +48,6 @@ daytripSchema.virtual('averageRating').get(function () {
   const total = this.ratings.reduce((sum, r) => sum + r.value, 0);
   return total / this.ratings.length;
 });
-
 
 daytripSchema.set('toJSON', { virtuals: true });
 daytripSchema.set('toObject', { virtuals: true });

@@ -16,11 +16,10 @@ function DaytripDetails() {
   const [isSaved, setIsSaved] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [tempRating, setTempRating] = useState(0);
-  const [userRating, setUserRating] = useState(0); // user's personal rating
+  const [userRating, setUserRating] = useState(0); 
   const user = JSON.parse(localStorage.getItem('userInfo'));
 
-  useEffect(() => {
-    const fetchDaytrip = async () => {
+  const fetchDaytrip = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/api/daytrips/${id}`);
         setDaytrip(res.data);
@@ -46,6 +45,7 @@ function DaytripDetails() {
       }
     };
 
+  useEffect(() => {
     fetchDaytrip();
   }, [id]);
 
@@ -267,11 +267,11 @@ function DaytripDetails() {
               { headers: { Authorization: `Bearer ${user.token}` } }
             );
             setUserRating(rating);
-            // Optionally re-fetch trip
-          } catch (err) { 
+            await fetchDaytrip(); // ✅ Re-fetch fresh data
+          } catch (err) {
             console.error("Rating failed:", err);
           }
-        }}  
+        }}
       /> 
 
       <div className="space-y-6 mt-10">
@@ -336,6 +336,22 @@ function DaytripDetails() {
       </div>
       {/* Save & share buttons */}
       <div className="flex justify-end gap-4 mt-6 w-full">
+        {/*Google maps export*/}
+        {daytrip.locations?.length > 1 && (
+          <a
+            href={`https://www.google.com/maps/dir/${daytrip.locations
+              .map(loc => `${loc.lat},${loc.lng}`)
+              .join('/')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 border px-4 py-2 rounded shadow text-green-600 hover:text-green-800 hover:bg-gray-100 transition"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L3.5 20.29a.997.997 0 001.36 1.36L12 22l7.14-.35a.999.999 0 00.86-1.01V4a2 2 0 00-2-2H12z" />
+            </svg>
+            Open in Google Maps
+          </a>
+        )}
         <button
           onClick={toggleSave}
           className="flex items-center gap-2 text-gray-600 hover:text-black border px-4 py-2 rounded shadow"

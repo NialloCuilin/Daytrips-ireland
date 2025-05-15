@@ -1,8 +1,6 @@
-  import { useState } from 'react'
-  import { Routes, Route } from 'react-router-dom';
+  import { Routes, Route, Meta } from 'react-router-dom';
   import { LoadScript } from '@react-google-maps/api';
   import { Navigate } from 'react-router-dom';
-  import React from 'react';
   import './App.css'
   import Home from './pages/Home';
   import About from './pages/About';
@@ -23,12 +21,11 @@
   import { ToastContainer } from 'react-toastify';
   import 'react-toastify/dist/ReactToastify.css';
 
-  const GOOGLE_MAPS_API_KEY = 'AIzaSyA3yNr0eqeBW2rjE9LV5kkk7hnJgtVM4Sw';
   const user = JSON.parse(localStorage.getItem('userInfo')); 
 
   function App() {
     return (
-      <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} libraries={['places']}>
+      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={['places']}>
         <div className="flex flex-col min-h-screen">
           <Navbar/>
           <main className="flex-grow">
@@ -44,14 +41,11 @@
             <Route path="/daytrips/:id" element={<DaytripDetails />} />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/feed" element={<Feed />} />
-            
-            {/* Explore filter pages */}
             <Route path="/explore/location" element={<LocationFilter />} />
             <Route path="/explore/county" element={<CountyFilter />} />
             <Route path="/explore/tags" element={<TagsFilter />} />
             <Route path="/explore/toprated" element={<TopRated />} />
           </Routes>
-
           </main> 
           <Footer/>
           <ToastContainer position="bottom-right" autoClose={3000} /> 

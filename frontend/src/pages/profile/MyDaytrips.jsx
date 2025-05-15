@@ -1,7 +1,7 @@
 import DaytripCard from '../../components/DaytripCard';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaMapMarkedAlt } from "react-icons/fa";
+import { FaMapMarkedAlt, FaTrash } from "react-icons/fa";
 
 function MyDaytrips({ userId, onCreate }) {
   const [daytrips, setDaytrips] = useState([]);
@@ -23,6 +23,24 @@ function MyDaytrips({ userId, onCreate }) {
       .catch((err) => console.error("Error fetching daytrips:", err));
   }, [userId]);
 
+  const handleDelete = async (id) => {
+    const confirm = window.confirm('Are you sure you want to delete this daytrip?');
+    if (!confirm) return;
+
+    try {
+      await axios.delete(`/api/daytrips/${id}`, {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo'))?.token}`
+        }
+      });
+      setDaytrips(prev => prev.filter(trip => trip._id !== id));
+    } catch (err) {
+      console.error('Error deleting daytrip:', err);
+      alert('Failed to delete daytrip.');
+    }
+  };
+
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -30,7 +48,6 @@ function MyDaytrips({ userId, onCreate }) {
           <FaMapMarkedAlt className="text-black" />
           Created Daytrips
         </h3>
-        {/* 👇 Only show button if viewing own profile */}
         {currentUserId === userId && (
           <button
             onClick={onCreate}
@@ -43,7 +60,18 @@ function MyDaytrips({ userId, onCreate }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {daytrips.map(trip => (
-          <DaytripCard key={trip._id} daytrip={trip} />
+          <div key={trip._id} className="relative">
+            <DaytripCard daytrip={trip} />
+            {currentUserId === userId && (
+              <button
+                onClick={() => handleDelete(trip._id)}
+                className="absolute top-2 right-2 bg-gray-400 hover:bg-red-700 text-white p-2 rounded-full shadow-md"
+                title="Delete this daytrip"
+              >
+                <FaTrash />
+              </button>
+            )}
+          </div>
         ))}
       </div>
     </div>

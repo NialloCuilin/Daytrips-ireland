@@ -4,7 +4,7 @@ const uploadPhoto = async (req, res) => {
   try {
     const fileStr = req.body.data;
 
-    console.log('Received file string:', fileStr.slice(0, 100)); // just the first 100 chars
+    console.log('Received file string:', fileStr.slice(0, 100)); //the first 100 chars
 
     const uploadedResponse = await cloudinary.uploader.upload(fileStr);
 
