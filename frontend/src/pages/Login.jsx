@@ -56,11 +56,13 @@ function Login() {
         <form onSubmit={handleLogin} className="space-y-6">
          {/* Email Field */}
           <div className="relative">
-            <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <FaEnvelope className="absolute top-4 left-3 text-gray-400" />
             <input
               type="email"
               placeholder="Email"
-              className="w-full pl-10 pr-4 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full pl-10 pr-4 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                emailError ? 'border-red-400' : 'border-green-500'
+              }`}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -69,6 +71,7 @@ function Login() {
             />
             {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
           </div>
+
           {/* Password Field */}
           <div className="relative">
             <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
