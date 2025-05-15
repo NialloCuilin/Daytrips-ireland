@@ -1,4 +1,5 @@
 const Daytrip = require('../models/Daytrip');
+const Activity = require('../models/Activity');
 const mongoose = require('mongoose');
 
 const createDaytrip = async (req, res) => {
@@ -28,6 +29,11 @@ const createDaytrip = async (req, res) => {
     });
 
     await daytrip.save();
+    await Activity.create({
+      type: 'create',
+      actor: author, // assuming `author` is the user ID
+      daytrip: daytrip._id
+    });
     res.status(201).json(daytrip);
   } catch (err) {
     res.status(500).json({ message: 'Failed to create daytrip', error: err.message });
@@ -105,15 +111,25 @@ const rateDaytrip = async (req, res) => {
       existingRating.value = value;
       existingRating.comment = comment;
       existingRating.title = title;
+      existingRating.createdAt = new Date();
     } else {
       daytrip.ratings.push({
         user: userId,
         value,
         comment,
         title,
-        createdAt: new Date() // optional, handled by schema default
+        createdAt: new Date()
       });
-}
+    }
+
+    // ✅ Always log the rating activity (whether new or updated)
+    await Activity.create({
+      type: 'rate',
+      actor: userId,
+      daytrip: daytrip._id,
+      value: value,
+    });
+
     const sum = daytrip.ratings.reduce((acc, r) => acc + r.value, 0);
     daytrip.averageRating = sum / daytrip.ratings.length;
 
@@ -129,36 +145,39 @@ const rateDaytrip = async (req, res) => {
   }
 };
 
+
 // GET /api/reviews/user/:userId
-const getReviewsByUser = async (req, res) => {
+const getUserReviews = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.params.userId;
 
-    const allDaytrips = await Daytrip.find({ 'ratings.user': userId })
-      .select('title ratings') // select only what's needed
-      .populate('ratings.user', 'firstName lastName avatar');
+    const reviews = await Daytrip.find({
+      ratings: { $elemMatch: { user: userId } }
+    })
+      .populate('author', 'firstName lastName avatar')         // trip creator
+      .populate('ratings.user', 'firstName lastName avatar')   // reviewer info
+      .lean();
 
-    const userRatings = [];
-
-    allDaytrips.forEach(daytrip => {
-      daytrip.ratings.forEach(rating => {
-        if (rating.user._id.toString() === userId) {
-          userRatings.push({
-            ...rating.toObject(),
-            daytripTitle: daytrip.title,
-            daytripId: daytrip._id
-          });
-        }
-      });
+    // ✅ Safely compare populated user._id to userId string
+    const userReviews = reviews.flatMap(daytrip => {
+      return daytrip.ratings
+        .filter(r => r.user?._id?.toString() === userId)
+        .map(r => ({
+          ...r,
+          createdAt: r.createdAt || daytrip.createdAt || new Date(),
+          daytripId: daytrip._id,
+          daytripTitle: daytrip.title,
+          daytripImage: daytrip.images?.[0],
+          author: daytrip.author,
+          user: r.user
+        }));
     });
 
-    res.json(userRatings);
+    res.json(userReviews);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch reviews', details: err.message });
+    res.status(500).json({ message: "Failed to fetch reviews", error: err.message });
   }
 };
-
-
 
 module.exports = { 
   createDaytrip,
@@ -166,5 +185,5 @@ module.exports = {
   getAllDaytrips,
   getDaytripById,
   rateDaytrip,
-  getReviewsByUser 
+  getUserReviews
 };

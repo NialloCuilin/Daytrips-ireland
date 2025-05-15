@@ -15,10 +15,13 @@
   import Footer from './components/Footer';
   import CreateDaytrip from './pages/CreateDaytrip';
   import DaytripDetails from './components/DaytripDetails';
+  import Feed from './components/Feed';
   import LocationFilter from './pages/explore/location';
   import CountyFilter from './pages/explore/county';
   import TagsFilter from './pages/explore/tags';
   import TopRated from './pages/explore/toprated';
+  import { ToastContainer } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 
   const GOOGLE_MAPS_API_KEY = 'AIzaSyA3yNr0eqeBW2rjE9LV5kkk7hnJgtVM4Sw';
   const user = JSON.parse(localStorage.getItem('userInfo')); 
@@ -40,6 +43,7 @@
             <Route path="/create-daytrip" element={<CreateDaytrip />} />
             <Route path="/daytrips/:id" element={<DaytripDetails />} />
             <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/feed" element={<Feed />} />
             
             {/* Explore filter pages */}
             <Route path="/explore/location" element={<LocationFilter />} />
@@ -49,7 +53,8 @@
           </Routes>
 
           </main> 
-          <Footer/> 
+          <Footer/>
+          <ToastContainer position="bottom-right" autoClose={3000} /> 
         </div>
       </LoadScript>
     );

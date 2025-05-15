@@ -84,17 +84,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Contact / CTA */}
-      <section className="text-center py-16">
-        <h2 className="text-2xl font-bold mb-4">Get in Touch</h2>
-        <p className="mb-6 text-gray-700">Have feedback, want to collaborate, or just say hello?</p>
-        <a
-          href="/contact"
-          className="bg-green-700 text-white px-6 py-3 rounded hover:bg-green-800 transition"
-        >
-          Contact Us
-        </a>
-      </section>
+    
     </div>
   );
 };

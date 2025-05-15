@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { FaUserFriends, FaBookmark, FaMapMarkedAlt, FaMedal, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaMapPin , FaMapMarkedAlt, FaMedal, FaStar, FaMapMarkerAlt, FaUserPlus, FaUserCheck } from 'react-icons/fa';
 import CreateDaytrip from './CreateDaytrip';
-import MyDaytrips from '../components/profile/MyDaytrips';
-import SavedDaytrips from '../components/profile/SavedDaytrips';
-import UserReviews from '../components/profile/UserReviews';
+import MyDaytrips from './profile/MyDaytrips';
+import SavedDaytrips from './profile/SavedDaytrips';
+import UserReviews from './profile/UserReviews';
 import axios from 'axios';
+import UserListModal from '../components/UserListModal';
 
 const getRandomColor = () => {
   const colors = ['bg-red-700', 'bg-green-700', 'bg-blue-700', 'bg-yellow-700', 'bg-purple-700', 'bg-pink-700', 'bg-indigo-700', 'bg-teal-700'];
@@ -19,6 +20,10 @@ function Profile() {
   const [activeTab, setActiveTab] = useState('daytrips');
   const [avatarColor, setAvatarColor] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowing, setShowFollowing] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem('userInfo'));
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -27,13 +32,22 @@ function Profile() {
         const res = await axios.get(`/api/users/${userId}`);
         setUser(res.data);
         setAvatar(res.data.avatar || null);
+  
+        const currentUser = JSON.parse(localStorage.getItem('userInfo'));
+        
+        // ✅ Check if this is not your own profile
+        if (currentUser && userId !== currentUser._id) {
+          const isFollowing = res.data.followers?.includes(currentUser._id);
+          setIsFollowing(isFollowing);
+        }
       } catch (err) {
         console.error("Failed to fetch user data:", err);
       }
     };
-
+  
     if (userId) fetchUser();
   }, [userId]);
+  
 
   useEffect(() => {
     const savedColor = localStorage.getItem('avatarColor');
@@ -86,7 +100,50 @@ function Profile() {
     }
   };
 
+  const handleFollow = async () => {
+    try {
+      await axios.post(`/api/users/${userId}/follow`, null, {
+        headers: { Authorization: `Bearer ${currentUser.token}` }
+      });
+
+      // Update isFollowing immediately
+      setIsFollowing(true);
+
+      // Simulate adding to the follower list locally
+      setUser(prev => ({
+        ...prev,
+        followers: [...(prev.followers || []), currentUser._id]
+      }));
+    } catch (err) {
+      console.error('Failed to follow user:', err);
+    }
+  };
+
+  
+  const handleUnfollow = async () => {
+    try {
+      await axios.post(`/api/users/${userId}/unfollow`, null, {
+        headers: { Authorization: `Bearer ${currentUser.token}` }
+      });
+      setIsFollowing(false);
+
+      // 💡 Remove the user from the local followers list
+      setUser(prev => ({
+        ...prev,
+        followers: (prev.followers || []).filter(id => id !== currentUser._id)
+      }));
+    } catch (err) {
+      console.error('Failed to unfollow user:', err);
+    }
+  };
+
   if (!user) return <div className="text-center p-6">Loading profile...</div>;
+
+  console.log("user:", user);
+  console.log("currentUser:", currentUser);
+  console.log("userId param:", userId);
+  console.log("Match check (own profile):", userId === currentUser?._id);
+  console.log("Render follow button:", !!(currentUser && userId !== currentUser?._id));
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -114,6 +171,31 @@ function Profile() {
         <p className="text-gray-500 flex items-center gap-1">
           <FaMapMarkerAlt className="text-black" /> Co. {user.county}
         </p>
+
+        <p className="text-gray-600 text-sm mt-2">
+          <button onClick={() => setShowFollowers(true)} className="hover:underline mr-4">
+            {user.followers?.length || 0} follower{user.followers?.length === 1 ? '' : 's'}
+          </button>
+          <button onClick={() => setShowFollowing(true)} className="hover:underline">
+            {user.following?.length || 0} following
+          </button>
+        </p>
+
+
+        {currentUser && userId !== currentUser._id && (
+          <button
+            onClick={isFollowing ? handleUnfollow : handleFollow}
+            className={`mt-4 px-4 py-2 rounded-full shadow text-white transition  ${
+              isFollowing ? 'bg-gray-500 hover:bg-gray-600' : 'bg-green-600 hover:bg-green-700'
+            }`}
+          >
+            {isFollowing ? (
+              <span><FaUserCheck className="inline mr-1" /> Following</span>
+            ) : (
+              <span><FaUserPlus className="inline mr-1" /> Follow</span>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Tabs */}
@@ -125,22 +207,18 @@ function Profile() {
             <FaStar /><span>Reviews</span>
           </button>
         <button onClick={() => setActiveTab('saved')} className={`flex items-center space-x-2 px-4 py-2 rounded-full ${activeTab === 'saved' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
-          <FaBookmark /><span>Saved Trips</span>
+          <FaMapPin   /><span>Travel List</span>
         </button>
         <button onClick={() => setActiveTab('achievements')} className={`flex items-center space-x-2 px-4 py-2 rounded-full ${activeTab === 'achievements' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
           <FaMedal /><span>Achievements</span>
-        </button>
-        <button onClick={() => setActiveTab('friends')} className={`flex items-center space-x-2 px-4 py-2 rounded-full ${activeTab === 'friends' ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-700'}`}>
-          <FaUserFriends /><span>Friends</span>
         </button>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
         {activeTab === 'daytrips' && <MyDaytrips userId={user._id} onCreate={() => setShowForm(true)} />}
         {activeTab === 'reviews' && <UserReviews userId={user._id} />}
-        {activeTab === 'saved' && <SavedDaytrips user={user} />}
+        {activeTab === 'saved' && <SavedDaytrips userId={user._id} />}
         {activeTab === 'achievements' && <p>Your badges and milestones will show here!</p>}
-        {activeTab === 'friends' && <p>Connect with other explorers here!</p>}
       </div>
 
       {showForm && (
@@ -150,6 +228,23 @@ function Profile() {
           </div>
         </div>
       )}
+
+      {/* Following Modal */}
+      {showFollowers && (
+        <UserListModal
+          title="Followers"
+          users={user.followers || []}
+          onClose={() => setShowFollowers(false)}
+        />
+      )}
+
+      {showFollowing && (
+        <UserListModal
+          title="Following"
+          users={user.following || []}
+          onClose={() => setShowFollowing(false)}
+        />
+      )}  
     </div>
   );
 }

@@ -9,8 +9,10 @@ const {
     unsaveDaytrip,
     getSavedDaytrips,
     getUserById,
-  } = require('../controllers/userController'); 
-
+    followUser,
+    unfollowUser,
+    } = require('../controllers/userController'); 
+const { getUserReviews } = require('../controllers/daytripController');
 const router = express.Router();
 
 // @route POST /api/users/register
@@ -36,4 +38,11 @@ router.get('/:userId/saved-daytrips', protect, getSavedDaytrips);
 
 router.get('/:id', getUserById);
 
+router.get('/reviews/user/:userId', getUserReviews); // ✅ ADD THIS LINE
+
+// Follow a user
+router.post('/:id/follow', protect, followUser);
+
+// Unfollow a user
+router.post('/:id/unfollow', protect, unfollowUser);
 module.exports = router;    

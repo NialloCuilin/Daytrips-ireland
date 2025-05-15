@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+const ratingSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  value: { type: Number, min: 1, max: 5 },
+  title: { type: String },
+  comment: { type: String }
+}, {
+  timestamps: true  // ✅ This enables createdAt & updatedAt for each review
+});
+
 const daytripSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -31,22 +40,15 @@ const daytripSchema = new mongoose.Schema({
   tags: [String], // e.g., ["Hike", "Waterfall", "Birdwatching"]
   duration: String,
   travelType: [String], // e.g., ["Car", "Bus", "Bike"]
-  ratings: [
-  {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    value: { type: Number, min: 1, max: 5 },
-    title: { type: String },      
-    comment: {type: String},
-    createdAt: { type: Date, default: Date.now } 
-  }
-  ] 
+  ratings: [ratingSchema] 
 });
 
 daytripSchema.virtual('averageRating').get(function () {
-  if (!this.ratings.length) return 0;
+  if (!Array.isArray(this.ratings) || this.ratings.length === 0) return 0;
   const total = this.ratings.reduce((sum, r) => sum + r.value, 0);
   return total / this.ratings.length;
 });
+
 
 daytripSchema.set('toJSON', { virtuals: true });
 daytripSchema.set('toObject', { virtuals: true });

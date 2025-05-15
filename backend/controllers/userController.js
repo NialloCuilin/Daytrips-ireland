@@ -1,9 +1,9 @@
 const User = require('../models/User');
+const Activity = require('../models/Activity');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
-
 
 // @desc    Register a new user
 // @route   POST /api/users/register
@@ -117,6 +117,13 @@ const saveDaytrip = async (req, res) => {
     if (!user.savedDaytrips.includes(daytripId)) {
       user.savedDaytrips.push(daytripId);
       await user.save();
+
+      // ✅ Create activity for "save"
+      await Activity.create({
+        type: 'save',
+        actor: userId,
+        daytrip: daytripId
+      });
     }
 
     res.status(200).json({ message: "Daytrip saved" });
@@ -161,7 +168,10 @@ const getSavedDaytrips = async (req, res) => {
 };
 
 const getUserById = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select('-password'); // exclude password
+  const user = await User.findById(req.params.id)
+  .select('-password')
+  .populate('followers', 'firstName lastName avatar')
+  .populate('following', 'firstName lastName avatar');// exclude password
   if (user) {
     res.json(user);
   } else {
@@ -169,6 +179,51 @@ const getUserById = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 });
+
+const followUser = async (req, res) => {
+  const userId = req.user._id;
+  const targetId = req.params.id;
+
+  if (userId.toString() === targetId) {
+    return res.status(400).json({ message: "You can't follow yourself." });
+  }
+
+  const user = await User.findById(userId);
+  const target = await User.findById(targetId);
+
+  if (!user || !target) {
+    return res.status(404).json({ message: "User not found." });
+  }
+
+  if (!user.following.includes(targetId)) {
+    user.following.push(targetId);
+    target.followers.push(userId);  
+    await user.save();
+    await target.save();
+
+    // ✅ Log follow activity only
+    await Activity.create({
+      type: 'follow',
+      actor: userId,
+      targetUser: targetId
+    });
+  }
+
+  res.status(200).json({ message: "Followed successfully." });
+};
+
+// @desc    Unfollow a user
+// @route   POST /api/users/:id/unfollow
+// @access  Private
+const unfollowUser = async (req, res) => {
+  const userId = req.user._id;
+  const targetId = req.params.id;
+
+  await User.findByIdAndUpdate(userId, { $pull: { following: targetId } });
+  await User.findByIdAndUpdate(targetId, { $pull: { followers: userId } });
+
+  res.status(200).json({ message: "Unfollowed successfully." });
+};
 
 
 module.exports = {
@@ -179,4 +234,6 @@ module.exports = {
   unsaveDaytrip,
   getSavedDaytrips,
   getUserById,
+  followUser,    
+  unfollowUser, 
 };

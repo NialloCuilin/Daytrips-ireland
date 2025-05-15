@@ -1,6 +1,8 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import logo1 from '../assets/Images/logo1.png';
+import { FaRegNewspaper } from "react-icons/fa";
+
 
 function Navbar() {
   const [user, setUser] = useState(null);
@@ -50,6 +52,8 @@ function Navbar() {
             </span>
           </Link>
 
+       
+
           {/* Nav Links */}
           <div className="hidden md:flex space-x-6 items-center">
             <NavLink
@@ -78,6 +82,18 @@ function Navbar() {
             >
               Contact
             </NavLink>
+
+            {user && (
+              <NavLink
+                to="/feed"
+                className={({ isActive }) =>
+                  isActive ? "text-green-600 font-semibold" : "text-gray-700 hover:text-green-600"
+                }
+              >
+                <FaRegNewspaper className="text-4xl "/>
+              </NavLink>
+            )}
+
             {user ? (
             <div className="relative" ref={dropdownRef}>
               <img

@@ -5,7 +5,7 @@ const {
   getAllDaytrips, 
   getDaytripById, 
   rateDaytrip, 
-  getReviewsByUser // ✅ ADD THIS
+  getUserReviews // ✅ ADD THIS
 } = require('../controllers/daytripController');
 const { protect } = require('../middleware/authMiddleware');    
 const router = express.Router();
@@ -16,7 +16,7 @@ router.post('/:id/rate', protect, rateDaytrip);
 
 // GET
 router.get('/user/:userId', getUserDaytrips);
-router.get('/reviews/user/:userId', getReviewsByUser); // ✅ ADD THIS
+router.get('/reviews/user/:userId', getUserReviews); // ✅ ADD THIS
 router.get('/:id', getDaytripById);
 router.get('/', getAllDaytrips);
 
