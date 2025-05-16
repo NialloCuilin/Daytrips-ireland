@@ -4,9 +4,12 @@ import { FaEnvelope, FaUser, FaLock } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import scenicImage from '../assets/Images/parkanaur.jpg';
-import {countyTags} from '../utils/counties'; 
+import {countyTags} from '../utils/counties';
+import { useNavigate } from 'react-router-dom';
+
 
 function Signup() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -50,6 +53,7 @@ function Signup() {
     try {
       const res = await axios.post('http://localhost:5000/api/users/register', formData);
       toast.success('Registration successful!');
+      navigate('/login'); 
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed';
       toast.error(message);

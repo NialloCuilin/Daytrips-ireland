@@ -79,7 +79,7 @@ function Navbar() {
               <div className="relative" ref={dropdownRef}>
                 <img
                   src={user.avatar || 'https://via.placeholder.com/40'}
-                  alt="User Avatar"
+                  alt=""
                   className="w-10 h-10 rounded-full object-cover border cursor-pointer"
                   onClick={() => setShowDropdown(prev => !prev)}
                 />
