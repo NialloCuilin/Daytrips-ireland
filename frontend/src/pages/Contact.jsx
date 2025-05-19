@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import emailjs from '@emailjs/browser'; 
-import puffin from '../assets/images/puffin.jpg'; 
-import celticknot from '../assets/images/celtic-knot.jpg'; 
+import puffin from '../assets/Images/puffin.jpg'; 
+import celticknot from '../assets/Images/celtic-knot.jpg'; 
 import { FaUserAlt, FaEnvelope, FaComments } from 'react-icons/fa'; 
 import { toast } from 'react-toastify';
 
