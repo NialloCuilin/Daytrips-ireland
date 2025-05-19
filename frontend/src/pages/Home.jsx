@@ -4,7 +4,7 @@ import 'swiper/css/autoplay';
 import { Autoplay } from 'swiper/modules';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import dunluce from '../assets/Images/dunluce.jpg';
-import galway from '../assets/Images/galway_shopStreet.jpg';
+import galway from '../assets/Images/galway_shopStreet.JPG';
 import darkhedges from '../assets/Images/darkhedges.jpeg';
 import gortmore from '../assets/Images/gortmore_view2.jpg';
 import skellig_micheal from '../assets/Images/skellig_micheal.jpeg';
