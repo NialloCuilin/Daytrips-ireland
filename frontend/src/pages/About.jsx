@@ -1,8 +1,8 @@
 import { FaMapMarkedAlt, FaCompass, FaUsers } from 'react-icons/fa';
-import thistle_of_moher from '../assets/Images/thistle_of_moher.jpg';
+import thistle_of_moher from '../assets/Images/thistle_of_moher.JPG';
 import see_ireland_first from '../assets/Images/see_ireland_first.jpg';
 import binocs_me from '../assets/Images/binocs_me.jpg';
-import { FaMountain} from "react-icons/fa";
+import { FaMountain} from "react-icons/fa"; 
 
 const About = () => {
   return (
