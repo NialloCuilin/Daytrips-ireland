@@ -19,8 +19,8 @@ import sperringiant from '../assets/Images/sperrin_giant3.jpg';
 import example from '../assets/Images/example_daytrip.jpg';
 import example2 from '../assets/Images/example2.jpg';
 import example3 from '../assets/Images/example_reviews.jpg';
-import cliff_of_moher3 from '../assets/Images/cliffs_of_moher3.jpg';
-import dun_aongas from '../assets/Images/dun_aongas.jpg';
+import cliff_of_moher3 from '../assets/Images/cliffs_of_moher3.JPG';
+import dun_aongas from '../assets/Images/dun_aongas.JPG';
 import { FaCompass, FaDraftingCompass, FaEdit } from "react-icons/fa";
 
 const heroSlides = [
