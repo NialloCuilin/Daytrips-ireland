@@ -116,7 +116,7 @@
     const handleUnfollow = async () => {
       try {
         await axios.post(`/api/users/${userId}/unfollow`, null, {
-          headers: { Authorization: `Bearer ${currentUser.token}` }
+          headers: { Authorization: `Bearer ${currentUser.token}` } 
         });
         setIsFollowing(false);
         setUser(prev => ({

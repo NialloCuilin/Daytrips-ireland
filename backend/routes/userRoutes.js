@@ -13,6 +13,7 @@ const {
     unfollowUser,
     } = require('../controllers/userController'); 
 const { getUserReviews } = require('../controllers/daytripController');
+const { getUserFeed } = require('../controllers/activityController');
 const router = express.Router();
 
 // @route POST /api/users/register

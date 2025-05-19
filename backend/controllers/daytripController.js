@@ -3,43 +3,43 @@ const Activity = require('../models/Activity');
 const mongoose = require('mongoose'); 
 const asyncHandler = require('express-async-handler');
 
-const createDaytrip = async (req, res) => {
+const createDaytrip = asyncHandler(async (req, res) => {
   try {
+    console.log('USER:', req.user);
+
     const {
       title,
       description,
-      author,
       locations,
-      images,
-      countyTags,
-      tags,
       duration,
-      travelType,
+      tags,
+      countyTags,
+      images
     } = req.body;
 
-    const daytrip = new Daytrip({
+    if (!title || !locations || !req.user) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const newTrip = new Daytrip({
       title,
-      author,
       description,
       locations,
-      images,
-      countyTags,
-      tags,
       duration,
-      travelType,
+      tags,
+      countyTags,
+      images,
+      author: req.user._id,
     });
 
-    await daytrip.save();
-    await Activity.create({
-      type: 'create',
-      actor: author,
-      daytrip: daytrip._id
-    });
-    res.status(201).json(daytrip);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to create daytrip', error: err.message });
+    const saved = await newTrip.save();
+    res.status(201).json(saved);
+
+  } catch (error) {
+    console.error('CREATE DAYTRIP ERROR:', error.message);
+    res.status(500).json({ message: 'Error creating daytrip', error: error.message });
   }
-};
+});
 // GET /api/daytrips/user/:userId
 const getUserDaytrips = async (req, res) => {
   try {

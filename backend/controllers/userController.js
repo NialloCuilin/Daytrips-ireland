@@ -11,6 +11,10 @@ const asyncHandler = require('express-async-handler');
 const registerUser = async (req, res) => {
   const { firstName, lastName, email, password, county } = req.body;
 
+  if (!firstName || !lastName || !email || !password || !county) {
+    return res.status(400).json({ message: 'All fields are required' });
+  } 
+
   // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -43,6 +47,8 @@ const registerUser = async (req, res) => {
     email: user.email,
     token,
   });
+
+  
 };
 
 // @desc    Login a user
