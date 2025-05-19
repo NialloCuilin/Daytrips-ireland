@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
-import scenicImage from '../assets/Images/giants_causeway.jpg';
+import scenicImage from '../assets/Images/giants_causeway.JPG';
 import logo from '../assets/Images/logo.png';
 
 function Login() {
