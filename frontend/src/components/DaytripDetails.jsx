@@ -267,7 +267,7 @@ function DaytripDetails() {
               { headers: { Authorization: `Bearer ${user.token}` } }
             );
             setUserRating(rating);
-            await fetchDaytrip(); // ✅ Re-fetch fresh data
+            await fetchDaytrip(); // Re-fetch fresh data
           } catch (err) {
             console.error("Rating failed:", err);
           }
