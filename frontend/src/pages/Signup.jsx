@@ -53,7 +53,7 @@ function Signup() {
     }
 
     try {
-      const res = await axios.post(${API_URL}/api/users/register, formData);
+      const res = await axios.post(`${API_URL}/api/users/register`, formData);
       toast.success('Registration successful!');
       navigate('/login'); 
     } catch (error) {
