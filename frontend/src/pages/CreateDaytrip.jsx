@@ -9,6 +9,8 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { generalTags } from '../utils/tags';
 import {countyTags} from '../utils/counties';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function CreateDaytrip({ onClose }) {
   const [form, setForm] = useState({
     title: '',
@@ -201,7 +203,7 @@ function CreateDaytrip({ onClose }) {
     });
     const totalDuration = await calculateTripDuration();
    try {
-    await axios.post('http://localhost:5000/api/daytrips/create', {
+    await axios.post(`${API_URL}/api/daytrips/create`, {
       title: form.title,
       description: form.description,
       travelType: selectedTravelType.map(type => type.value),
