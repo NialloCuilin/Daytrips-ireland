@@ -17,7 +17,7 @@ function CreateDaytrip({ onClose }) {
     description: '',
     tags: '',
     countyTags: '',
-    travelType: 'Car',
+    travelType: 'Car',  
   });
   const [images, setImages] = useState([]);
   const onDrop = async (acceptedFiles) => {
@@ -214,12 +214,16 @@ function CreateDaytrip({ onClose }) {
         lng: place.lng,
         description: locationInputs[idx]?.description || '',
         timeSpent: parseInt(locationInputs[idx]?.timeSpent) || 0
-        })),
+      })),
       tags: selectedTags.map(tag => tag.value),
       countyTags: selectedCounties.map(county => county.value),
       duration: `${totalDuration} minutes`,
       images,
       author: user._id,
+    }, {
+      headers: {
+        Authorization: `Bearer ${user.token}`, 
+      }
     });
       alert('Daytrip created successfully!');
       if (onClose) onClose(); // Close modal if applicable
