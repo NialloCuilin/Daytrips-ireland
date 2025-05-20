@@ -3,6 +3,8 @@ import axios from "axios";
 import { FaStar, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function UserReviews({ userId }) {
   const [reviews, setReviews] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -17,7 +19,7 @@ function UserReviews({ userId }) {
 
   useEffect(() => {
     axios
-      .get(`/api/daytrips/reviews/user/${userId}`)
+      axios.get(`${API_URL}/api/daytrips/reviews/user/${userId}`)
       .then((res) => setReviews(res.data))
       .catch((err) => console.error("Failed to fetch reviews:", err));
   }, [userId]);
@@ -28,7 +30,7 @@ function UserReviews({ userId }) {
 
     try {
       const user = JSON.parse(localStorage.getItem("userInfo"));
-      await axios.delete(`/api/daytrips/reviews/${user._id}/${reviewId}`, {
+      await axios.delete(`${API_URL}/api/daytrips/reviews/${user._id}/${reviewId}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
 

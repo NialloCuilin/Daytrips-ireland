@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaMapMarkedAlt, FaTrash } from "react-icons/fa";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function MyDaytrips({ userId, onCreate }) {
   const [daytrips, setDaytrips] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -18,7 +20,7 @@ function MyDaytrips({ userId, onCreate }) {
   useEffect(() => {
     if (!userId) return;
 
-    axios.get(`/api/daytrips/user/${userId}`)
+    axios.get(`${API_URL}/api/daytrips/user/${userId}`)
       .then((res) => setDaytrips(res.data))
       .catch((err) => console.error("Error fetching daytrips:", err));
   }, [userId]);
@@ -28,7 +30,7 @@ function MyDaytrips({ userId, onCreate }) {
     if (!confirm) return;
 
     try {
-      await axios.delete(`/api/daytrips/${id}`, {
+      await axios.delete(`${API_URL}/api/daytrips/${id}`, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('userInfo'))?.token}`
         }

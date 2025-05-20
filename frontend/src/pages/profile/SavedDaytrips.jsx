@@ -3,6 +3,8 @@ import axios from 'axios';
 import DaytripCard from '../../components/DaytripCard';
 import { FaMapPin   } from "react-icons/fa";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function SavedDaytrips({ userId }) {
   const [savedTrips, setSavedTrips] = useState([]);
 
@@ -12,7 +14,7 @@ function SavedDaytrips({ userId }) {
 
     const { token } = JSON.parse(stored);
 
-    axios.get(`/api/users/${userId}/saved-daytrips`, {
+    axios.get(`${API_URL}/api/users/${userId}/saved-daytrips`, {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => setSavedTrips(res.data))
