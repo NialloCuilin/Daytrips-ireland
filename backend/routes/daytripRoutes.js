@@ -24,6 +24,6 @@ router.get('/', getAllDaytrips);
 
 // DELETE
 router.delete('/:id', protect, deleteDaytrip);
-router.delete('/reviews/:userId/:reviewId', protect, deleteReview);
+router.delete('/reviews/:reviewId', protect, deleteReview);
 
 module.exports = router;

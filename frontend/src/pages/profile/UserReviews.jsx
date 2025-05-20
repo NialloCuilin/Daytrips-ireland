@@ -30,7 +30,7 @@ function UserReviews({ userId }) {
 
     try {
       const user = JSON.parse(localStorage.getItem("userInfo"));
-      await axios.delete(`${API_URL}/api/daytrips/reviews/${user._id}/${reviewId}`, {
+      await axios.delete(`${API_URL}/api/daytrips/reviews/${reviewId}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
 
