@@ -194,7 +194,7 @@ const deleteDaytrip = asyncHandler(async (req, res) => {
 
 //delete review
 const deleteReview = asyncHandler(async (req, res) => {
-  const { userId, reviewId } = req.params;
+  const { reviewId } = req.params;
 
   const daytrip = await Daytrip.findOne({ "ratings._id": reviewId });
 
