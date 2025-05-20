@@ -31,7 +31,7 @@ function Profile() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`/api/users/${userId}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/${userId}`);
         setUser(res.data);
         setAvatar(res.data.avatar || null);
       } catch (err) {
@@ -41,6 +41,7 @@ function Profile() {
 
     if (userId) fetchUser();
   }, [userId]);
+
 
   useEffect(() => {
     if (user && currentUser && userId !== currentUser._id) {
