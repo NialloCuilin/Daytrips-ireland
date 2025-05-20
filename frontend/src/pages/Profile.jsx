@@ -14,6 +14,8 @@ const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Profile() {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
@@ -41,7 +43,6 @@ function Profile() {
 
     if (userId) fetchUser();
   }, [userId]);
-
 
   useEffect(() => {
     if (user && currentUser && userId !== currentUser._id) {
@@ -86,10 +87,11 @@ function Profile() {
 
       const imageUrl = res.data.secure_url;
       setAvatar(imageUrl);
-      await axios.post('/api/users/update-avatar', {
+      await axios.post(`${API_URL}/api/users/update-avatar`, {
         userId,
         avatarUrl: imageUrl,
       });
+
 
       if (userId === currentUser?._id) {
         const updatedUser = { ...user, avatar: imageUrl };
@@ -104,7 +106,7 @@ function Profile() {
 
   const handleFollow = async () => {
     try {
-      await axios.post(`/api/users/${userId}/follow`, null, {
+      await axios.post(`${API_URL}/api/users/${userId}/follow`, null, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       setIsFollowing(true);
@@ -119,7 +121,7 @@ function Profile() {
 
   const handleUnfollow = async () => {
     try {
-      await axios.post(`/api/users/${userId}/unfollow`, null, {
+      await axios.post(`${API_URL}/api/users/${userId}/unfollow`, null, {
         headers: { Authorization: `Bearer ${currentUser.token}` }
       });
       setIsFollowing(false);
