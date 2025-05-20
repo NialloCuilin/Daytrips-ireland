@@ -37,7 +37,7 @@ function Daytrips() {
   useEffect(() => {
     const fetchDaytrips = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/daytrips");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/daytrips`);
         setDaytrips(res.data);
       } catch (err) {
         console.error("Failed to fetch daytrips:", err);
