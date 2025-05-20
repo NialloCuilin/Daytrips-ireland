@@ -10,6 +10,8 @@ import { FaMapMarkedAlt, FaMapMarkerAlt, FaBookmark, FaRegBookmark, FaClock, FaS
 import LocationMap from '../components/LocationMap';
 import RatingModal from "../components/RatingModal";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function DaytripDetails() {
   const { id } = useParams();
   const [daytrip, setDaytrip] = useState(null);
@@ -21,7 +23,7 @@ function DaytripDetails() {
 
   const fetchDaytrip = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/daytrips/${id}`);
+        const res = await axios.get(`${API_URL}/api/daytrips/${id}`);
         setDaytrip(res.data);
 
         if (user && res.data.ratings?.length) {
@@ -52,23 +54,23 @@ function DaytripDetails() {
   if (!daytrip) return <div className="p-6 text-center">Loading...</div>;
   
   const toggleSave = async () => {
-    if (!user) return;
-  
-    try {
-      if (isSaved) {
-        await axios.delete(`/api/users/unsave-daytrip/${id}`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-      } else {
-        await axios.post(`/api/users/save-daytrip/${id}`, null, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-      }
-      setIsSaved(!isSaved);
-    } catch (err) {
-      console.error("Failed to toggle save:", err);
+  if (!user) return;
+
+  try {
+    if (isSaved) {
+      await axios.delete(`${API_URL}/api/users/unsave-daytrip/${id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+    } else {
+      await axios.post(`${API_URL}/api/users/save-daytrip/${id}`, null, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
     }
-  };
+    setIsSaved(!isSaved);
+  } catch (err) {
+    console.error("Failed to toggle save:", err);
+  }
+};
 
   const handleShare = () => {
     const shareData = {
@@ -101,11 +103,10 @@ function DaytripDetails() {
   const submitRating = async (value) => {
     try {
       setUserRating(value);
-      await axios.post(
-        `http://localhost:5000/api/daytrips/${id}/rate`,
-        { value },
-        { headers: { Authorization: `Bearer ${user.token}` } }
-      );
+      await axios.post(`${API_URL}/api/daytrips/${id}/rate`, 
+      { value }, {
+      headers: { Authorization: `Bearer ${user.token}` }
+    });
     } catch (err) {
       console.error("Failed to rate trip", err);
     }
@@ -262,7 +263,7 @@ function DaytripDetails() {
         onSubmit={async (rating, comment, title) => {
           try {
             await axios.post(
-              `http://localhost:5000/api/daytrips/${id}/rate`,
+            `${API_URL}/api/daytrips/${id}/rate`,
               { value: rating, comment, title },
               { headers: { Authorization: `Bearer ${user.token}` } }
             );
