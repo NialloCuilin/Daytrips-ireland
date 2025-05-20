@@ -4,6 +4,8 @@
   import { Link } from 'react-router-dom';
   import { formatDistanceToNow } from 'date-fns';
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   function Feed() {
     const [feed, setFeed] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@
       const fetchFeed = async () => {
         try {
           const token = JSON.parse(localStorage.getItem('userInfo'))?.token;
-          const res = await axios.get('/api/activity/feed', {
+          const res = await axios.get(`${API_URL}/api/activity/feed`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
