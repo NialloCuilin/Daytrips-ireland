@@ -5,6 +5,8 @@ import { FaEnvelope, FaLock } from 'react-icons/fa';
 import scenicImage from '../assets/Images/giants_causeway.JPG';
 import logo from '../assets/Images/logo.png';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +25,7 @@ function Login() {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/users/login', {
+      const res = await axios.post(`${API_URL}/api/users/login`, {
         email,
         password,
       });

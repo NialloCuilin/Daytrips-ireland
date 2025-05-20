@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import DaytripCard from '../../components/DaytripCard';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function TopRated() {
   const [daytrips, setDaytrips] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6); // how many cards to show
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/daytrips').then(res => {
+    axios.get(`${API_URL}/api/daytrips`).then(res => {
       const sorted = res.data.sort((a, b) => {
         const avgDiff = (b.averageRating || 0) - (a.averageRating || 0);
         if (avgDiff !== 0) return avgDiff;

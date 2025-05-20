@@ -3,12 +3,14 @@ import axios from 'axios';
 import DaytripCard from '../../components/DaytripCard';
 import { generalTags } from '../../utils/tags';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function TagsFilter() {
   const [daytrips, setDaytrips] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/daytrips').then(res => setDaytrips(res.data));
+    axios.get(`${API_URL}/api/daytrips`).then(res => setDaytrips(res.data));
   }, []);
 
   const toggleTag = (tagValue) => {

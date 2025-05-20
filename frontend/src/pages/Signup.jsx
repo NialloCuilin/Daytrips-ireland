@@ -7,6 +7,7 @@ import scenicImage from '../assets/Images/parkanaur.jpg';
 import {countyTags} from '../utils/counties';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Signup() {
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ function Signup() {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/users/register', formData);
+      const res = await axios.post(`${API_URL}/api/users/register`, formData);
       toast.success('Registration successful!');
       navigate('/login'); 
     } catch (error) {

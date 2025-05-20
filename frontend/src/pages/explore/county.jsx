@@ -3,12 +3,14 @@ import axios from 'axios';
 import DaytripCard from '../../components/DaytripCard';
 import { countyTags } from '../../utils/counties';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function CountyFilter() {
   const [daytrips, setDaytrips] = useState([]);
   const [selected, setSelected] = useState('');
   // Fetch daytrips on component mount
   useEffect(() => {
-    axios.get('http://localhost:5000/api/daytrips').then(res => setDaytrips(res.data));
+    axios.get(`${API_URL}/api/daytrips`).then(res => setDaytrips(res.data));
   }, []);
 
   const filtered = daytrips.filter(trip => trip.countyTags?.includes(selected));

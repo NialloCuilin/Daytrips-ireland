@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import DaytripCard from '../../components/DaytripCard';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function LocationFilter() {
   const [daytrips, setDaytrips] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -12,7 +14,7 @@ function LocationFilter() {
   const AVERAGE_SPEED_KMH = 45; // Estimate: driving speed
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/daytrips').then(res => setDaytrips(res.data));
+    axios.get(`${API_URL}/api/daytrips`).then(res => setDaytrips(res.data));
     navigator.geolocation.getCurrentPosition(
       pos => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       err => console.warn(err)
